@@ -1,4 +1,3 @@
-// Utils/types/User.ts
 export type UserRole = 'Estudiante' | 'Admin' | 'Profesor';
 export type EnrollmentStatus = 'Matriculado' | 'NoMatriculado' | 'NoAplica';
 
@@ -7,4 +6,5 @@ export interface User {
     type: UserRole;
     enroll: EnrollmentStatus;
     name: string;
+    history: string[];
 }
