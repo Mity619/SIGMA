@@ -4,7 +4,7 @@ import {useFirebaseAuth} from '../Hooks/useFirebaseAuth'
 import type {UserRole, EnrollmentStatus} from '../Utils/User'
 import "./SCSS/log.scss";
 
-export default function SingUp() {
+export default function SignUp() {
 
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
@@ -45,27 +45,26 @@ export default function SingUp() {
             if (result.success) {
 
                 alert("Registro exitoso. Ahora inicia sesión.");
-                navigate("/login");
+                navigate("/SignIn");
 
             } else {
                 
                 alert(result.error || "Error al registrarse");
 
             }
-            } catch (error : unknown) {
-
-                if(error instanceof Error){
-
-                    alert(error.message)
-
-                }
+            
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                alert(error.message)
             }
+        }
     }
+    
     return (
 
         <div className="login-container">
             <div className="login-card">
-                <h2 style={{ color: 'black' }}>Register</h2>
+                <h1 style={{ color: 'black' }}>Registrate</h1>
                 <input
                     type="name"
                     className="form-control"
@@ -100,7 +99,7 @@ export default function SingUp() {
                 </button>
                 <button
                     className="btn btn-link mt-2"
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/SignIn")}
                 >
                 ¿Ya tienes cuenta? Login
                 </button>
