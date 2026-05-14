@@ -11,6 +11,11 @@ Currently, two official plugins are available:
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
+## Firebase Environment Variables
+
+Create a root `.env` file with the Firebase values used by `src/Firebase/config.ts`.
+You can copy `.env.example` and fill in your own credentials.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
