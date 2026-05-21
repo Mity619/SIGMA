@@ -15,8 +15,12 @@ export default function SignIn() {
         try {
             const result = await firebaseLogin(email, password);
             if (result.success && result.user) {
-                contextLogin(result.user);   
-                navigate("/Matriculas");
+                contextLogin(result.user);
+                console.log(result.user.type);
+                if (result.user.type==='Admin'){
+                    navigate("/DashboardAdmin");
+                }   
+                
             } else {
                 alert(result.error || "Error al iniciar sesión");
             }
