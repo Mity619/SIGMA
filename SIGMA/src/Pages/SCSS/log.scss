@@ -1,30 +1,219 @@
+// ── Variables (misma paleta que Home/Navbar) ───────────────
+$purple:        #7C3AED;
+$purple-dark:   #5B21B6;
+$purple-light:  #EDE9FE;
+$purple-faint:  #F5F3FF;
+$text-dark:     #111827;
+$text-mid:      #4B5563;
+$text-light:    #9CA3AF;
+$border:        #E5E7EB;
+$border-focus:  #7C3AED;
+$white:         #ffffff;
+$error:         #EF4444;
+
+// ── Animations ─────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blobPulse {
+  0%, 100% { transform: scale(1) translate(0, 0); }
+  33%       { transform: scale(1.04) translate(8px, -10px); }
+  66%       { transform: scale(0.97) translate(-6px, 6px); }
+}
+
+// ── Page wrapper ────────────────────────────────────────────
 .login-container {
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  background: $white;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  justify-content: center;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  position: relative;
+  overflow: hidden;
 
+  // Blob decorativo fondo — eco del óvalo de Home
+  &::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -160px;
+    width: 540px;
+    height: 640px;
+    background: $purple;
+    border-radius: 50%;
+    opacity: 0.10;
+    animation: blobPulse 9s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  // Segundo blob sutil abajo-izquierda
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -120px;
+    width: 360px;
+    height: 420px;
+    background: $purple;
+    border-radius: 50%;
+    opacity: 0.06;
+    animation: blobPulse 13s ease-in-out infinite reverse;
+    pointer-events: none;
+  }
+}
+
+// ── Card ────────────────────────────────────────────────────
+.login-card {
+  position: relative;
+  z-index: 1;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 20px;
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.04),
+    0 20px 60px rgba(124, 58, 237, 0.10);
+  padding: 2.8rem 2.6rem 2.4rem;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeUp 0.6s ease both;
+
+  // Logo SIGMA arriba de la card
+  &::before {
+    content: 'SIGMA';
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: $purple;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  h1 {
+    font-size: 1.65rem !important;
+    font-weight: 800 !important;
+    color: $text-dark !important;
+    text-align: center;
+    line-height: 1.2;
+    margin: 0 0 0.5rem !important;
+  }
+}
+
+// ── Inputs & Select ─────────────────────────────────────────
+.form-control {
+  width: 100%;
+  padding: 0.78rem 1rem;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.92rem;
+  color: $text-dark;
+  background: $purple-faint;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  appearance: none;
+
+  &::placeholder {
+    color: $text-light;
+  }
+
+  &:focus {
+    border-color: $border-focus;
+    background: $white;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  }
+
+  // Select específico
+  &:is(select) {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237C3AED' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+
+    option {
+      color: $text-dark;
+      background: $white;
+    }
+  }
+}
+
+// ── Buttons ─────────────────────────────────────────────────
+.btn {
+  width: 100%;
+  padding: 0.88rem 1rem;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+  // ── Botón primario (Login / Register)
+  &-primary,
+  &-success {
+    color: $white;
+    background: $purple;
+    margin-top: 0.25rem;
+
+    &:hover {
+      background: $purple-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.36);
+    }
+    &:active { transform: translateY(0); box-shadow: none; }
+  }
+
+  // ── Botón link (navegación secundaria)
+  &-link {
+    background: transparent;
+    color: $purple;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    padding: 0.4rem 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: $purple-dark;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  // ── Espaciado superior opcional
+  &.mt-2 { margin-top: 0.25rem; }
+}
+
+// ── Responsive ───────────────────────────────────────────────
+@media (max-width: 480px) {
   .login-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 2rem;
-    border-radius: 15px;
-    background: white;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    margin: 1.5rem;
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
+// ── Wrapper que incluye Navbar + contenido centrado ──────────
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
 
-    .form-control {
-      margin-bottom: 1rem;
-    }
-
-    button {
-      width: 100%;
-      font-weight: bold;
-    }
+  // El login-container ocupa el espacio restante bajo el navbar
+  .login-container {
+    flex: 1;
+    min-height: calc(100vh - 68px); // 68px = altura del Navbar
   }
 }

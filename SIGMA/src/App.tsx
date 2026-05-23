@@ -4,13 +4,15 @@ import AdminRoute from "./Routes/AdminRoutes";
 import SignUp from "./Pages/SignUp";
 import SignIn from "./Pages/SignIn";
 import DashboardAdmin from "./Pages/DashboardAdmin";
-import ArbolAcademico from "./Pages/ArbolAcademico"
+import ArbolAcademico from "./Pages/ArbolAcademico";
+import Home from "./Pages/Home"
 
 function App() {  
     return (  
         <Routes>
             <Route path="/SignUp" element={<SignUp/>} />
             <Route path="/SignIn" element={<SignIn/>} />
+            <Route path="/" element={<Home/>} />
 
             <Route element={<AdminRoute/>}>
                 <Route path="/DashboardAdmin" element={<DashboardAdmin />} />
