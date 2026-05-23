@@ -1,0 +1,158 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+$purple:      #7C3AED;
+$purple-dark: #5B21B6;
+$text-dark:   #111827;
+$text-mid:    #4B5563;
+$white:       #ffffff;
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.home {
+  min-height: 100vh;
+  width: 100%;
+  background: $white;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  color: $text-dark;
+
+  // ── Hero ocupa toda la altura restante ────────────────────
+  &__hero {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4rem;               // padding horizontal generoso
+    gap: 0;
+    min-height: calc(100vh - 68px); // ocupa viewport completo menos navbar
+
+    @media (max-width: 960px) {
+      flex-direction: column-reverse;
+      padding: 3rem 2rem;
+      min-height: auto;
+      text-align: center;
+      gap: 2rem;
+    }
+  }
+
+  // ── Columna texto ─────────────────────────────────────────
+  &__hero-content {
+    flex: 0 0 48%;
+    max-width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    animation: fadeSlideUp 0.65s ease both;
+
+    @media (max-width: 960px) {
+      flex: unset;
+      max-width: 100%;
+      align-items: center;
+    }
+  }
+
+  &__hero-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: $text-mid;
+    margin-bottom: 1.1rem;
+    animation: fadeSlideUp 0.65s 0.05s ease both;
+  }
+
+  &__hero-title {
+    font-size: clamp(2.6rem, 5vw, 4rem);  // mucho más grande
+    font-weight: 900;
+    line-height: 1.08;
+    color: $text-dark;
+    margin-bottom: 1.4rem;
+    animation: fadeSlideUp 0.65s 0.12s ease both;
+  }
+
+  &__hero-desc {
+    font-size: 1.1rem;
+    color: $text-mid;
+    margin-bottom: 2.5rem;
+    animation: fadeSlideUp 0.65s 0.19s ease both;
+  }
+
+  &__hero-cta {
+    display: inline-block;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: $white !important;
+    background: $purple;
+    text-decoration: none !important;
+    padding: 1rem 2.8rem;           // botón más grande
+    border-radius: 10px;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    animation: fadeSlideUp 0.65s 0.26s ease both;
+
+    &:hover {
+      background: $purple-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(124, 58, 237, 0.38);
+    }
+    &:active { transform: translateY(0); }
+  }
+
+  // ── Columna visual ────────────────────────────────────────
+  &__hero-visual {
+    flex: 0 0 50%;
+    max-width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: popIn 0.75s 0.1s ease both;
+
+    @media (max-width: 960px) {
+      flex: unset;
+      max-width: 100%;
+    }
+  }
+
+  // Óvalo púrpura vertical — igual al diseño de referencia
+  &__hero-blob {
+    position: relative;
+    // Ancho y alto para un óvalo vertical prominente
+    width: clamp(320px, 42vw, 520px);
+    height: clamp(380px, 72vh, 620px);
+    background: $purple;
+    // Óvalo puro con border-radius
+    border-radius: 50% / 50%;
+    overflow: hidden;
+    box-shadow: 0 24px 72px rgba(124, 58, 237, 0.28);
+
+    @media (max-width: 960px) {
+      width: clamp(220px, 60vw, 340px);
+      height: clamp(260px, 45vw, 400px);
+    }
+  }
+
+  // Imagen sin distorsión, apoyada en la base del óvalo
+  &__hero-img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 108%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+}
