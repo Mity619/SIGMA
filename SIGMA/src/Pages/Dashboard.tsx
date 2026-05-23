@@ -37,11 +37,9 @@ export default function Dashboard() {
     return (
         <main>
             <h1>Dashboard</h1>
-            {user ? (
-                <button type="button" onClick={() => navigate("/news/create")}>
-                    Crear noticia
-                </button>
-            ) : null}
+            <button className="btn btn-danger btn-sm" onClick={authContext.logout}>
+                Cerrar sesión
+            </button>
             <NewsSearch
                 value={searchQuery}
                 onChange={setSearchQuery}

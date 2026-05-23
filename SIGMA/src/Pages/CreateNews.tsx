@@ -60,6 +60,9 @@ export default function CreateNews() {
 
     return (
         <main>
+            <button className="btn btn-danger btn-sm" onClick={authContext.logout}>
+                Cerrar sesión
+            </button>
             <h1>Crear noticia</h1>
             {error ? <p>{error}</p> : null}
             <CreateNewsForm onSubmit={handleSubmit} submitting={submitting} />
