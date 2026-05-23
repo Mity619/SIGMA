@@ -13,7 +13,7 @@ export default function AdminRoute() {
     
     // Verificar que existe usuario Y que es Estudiante
     if (!user) {
-        return <Navigate to="/login" />;
+        return <Navigate to="/SignIn" />;
     }
     
     // Verificar el tipo de usuario
