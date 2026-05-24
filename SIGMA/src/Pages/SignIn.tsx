@@ -21,7 +21,7 @@ export default function SignIn() {
                     navigate("/DashboardAdmin");
                 }
             } else {
-                alert(result.error || "Error al iniciar sesión");
+                alert(result.error || "Error al iniciar sesion");
             }
         } catch (error: unknown) {
             if (error instanceof Error) alert(error.message);
