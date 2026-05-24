@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { useArchivo } from "../Hooks/useArbolAcademico";
 import AuthContext from "../Context/AuthContext";
 
 export default function ArbolAcademico() {
     const auth = useContext(AuthContext);
+    const navigate = useNavigate();
     const [name, setName] = useState("");
     const [type, setType] = useState<"Facultad" | "Carrera" | "Pensum">("Facultad");
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -30,6 +32,13 @@ export default function ArbolAcademico() {
         if (parentType === "Carrera") return "Pensum";
         return null;
     };
+
+    const openPensumGraph = (node: any) => {
+        if (node.type !== "Pensum") return;
+
+        navigate(`/admin/pensum/${node.id}`);
+    };
+
     const TreeNodeComponent = ({ node }: any) => {
         const isFolder = canHaveChildren(node.type);
         const childType = getChildType(node.type);
@@ -54,14 +63,20 @@ export default function ArbolAcademico() {
                                 onChange={(e) => setEditName(e.target.value)}
                             />
                         ) : (
-                            <span>
-                                {node.name}
-                                {node.type === "Pensum" && node.childrenId && (
+                        <span
+                            style={{
+                                cursor: node.type === "Pensum" ? "pointer" : "default",
+                            }}
+                            onClick={() => openPensumGraph(node)}
+                        >
+                            {node.name}
+
+                            {node.type === "Pensum" && !node.childrenId && (
                                     <small style={{ marginLeft: "8px", color: "gray" }}>
-                                        (grafo: {node.childrenId})
+                                        (Vacio)
                                     </small>
                                 )}
-                            </span>
+                        </span>
                         )}
                     </div>
                     <div className="actions">

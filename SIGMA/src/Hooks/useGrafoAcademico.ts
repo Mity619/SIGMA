@@ -234,7 +234,7 @@ export function useAcademicGraph() {
 
         //Si el prerrequisito ya depende de la materia actual, se formaría un ciclo.
         if (materiaDependsOn(prerequisiteId, materiaId, currentMaterias)) {
-            alert("No se puede agregar porque se formaría un ciclo en el grafo.");
+            alert("El prerrequisito ya depende de la materia actual");
             return;
         }
 
