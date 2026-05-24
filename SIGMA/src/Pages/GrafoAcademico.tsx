@@ -3,7 +3,59 @@ import { useParams } from "react-router-dom";
 import { useArchivo } from "../Hooks/useArbolAcademico";
 import { useAcademicGraph } from "../Hooks/useGrafoAcademico";
 import type { Grupo, GrafoMateria, Materia } from "../Utils/Graph";
+import AdminNavbar from "../Components/AdminNavbar";
+import "./SCSS/GrafoAcademico.scss";
 
+// Iconos SVG inline
+const IconBook = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+    </svg>
+);
+
+const IconLayout = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+    </svg>
+);
+
+const IconPlus = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
+
+const IconEdit = () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+);
+
+const IconSave = () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" />
+    </svg>
+);
+
+const IconTrash = () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
+    </svg>
+);
+
+const IconX = () => (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+);
+
+const IconEmpty = () => (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><line x1="8" y1="12" x2="16" y2="12" />
+    </svg>
+);
+
+// Componente principal
 export default function GrafoAcademico() {
     const { pensumId } = useParams();
 
@@ -94,12 +146,7 @@ export default function GrafoAcademico() {
             alert("Debes escribir el nombre del grupo.");
             return;
         }
-
-        const newGrupo: Grupo = {
-            nombre: grupoNombre,
-            cupos: grupoCupos,
-        };
-
+        const newGrupo: Grupo = { nombre: grupoNombre, cupos: grupoCupos };
         setGrupos([...grupos, newGrupo]);
         setGrupoNombre("");
         setGrupoCupos(30);
@@ -111,20 +158,11 @@ export default function GrafoAcademico() {
 
     const handleCreateMateria = async () => {
         if (!carreraId) return;
-
         if (!nombre.trim() || !codigo.trim()) {
             alert("Debes escribir el nombre y el código de la materia.");
             return;
         }
-
-        await addMateriaToCarrera(
-            carreraId,
-            nombre,
-            codigo,
-            creditos,
-            grupos
-        );
-
+        await addMateriaToCarrera(carreraId, nombre, codigo, creditos, grupos);
         clearMateriaForm();
     };
 
@@ -138,48 +176,27 @@ export default function GrafoAcademico() {
 
     const handleEditMateriaCarrera = async () => {
         if (!carreraId || !editingMateriaId) return;
-
         if (!editNombre.trim() || !editCodigo.trim()) {
             alert("Debes escribir el nombre y el código de la materia.");
             return;
         }
-
-        await editMateriaCarrera(
-            editingMateriaId,
-            carreraId,
-            editNombre,
-            editCodigo,
-            editCreditos,
-            editGrupos
-        );
-
+        await editMateriaCarrera(editingMateriaId, carreraId, editNombre, editCodigo, editCreditos, editGrupos);
         setEditingMateriaId(null);
     };
 
     const handleDeleteMateriaCarrera = async (materiaId: string) => {
         if (!carreraId) return;
-
-        const confirmDelete = confirm(
-            "¿Seguro que quieres eliminar esta materia de la carrera?"
-        );
-
+        const confirmDelete = confirm("¿Seguro que quieres eliminar esta materia de la carrera?");
         if (!confirmDelete) return;
-
         await deleteMateriaCarrera(materiaId, carreraId);
     };
 
     const addGrupoToEditMateria = () => {
         const nombreGrupo = prompt("Nombre del grupo:");
         if (!nombreGrupo) return;
-
         const cuposGrupo = Number(prompt("Cupos del grupo:"));
         if (!cuposGrupo) return;
-
-        const newGrupo: Grupo = {
-            nombre: nombreGrupo,
-            cupos: cuposGrupo,
-        };
-
+        const newGrupo: Grupo = { nombre: nombreGrupo, cupos: cuposGrupo };
         setEditGrupos([...editGrupos, newGrupo]);
     };
 
@@ -189,51 +206,33 @@ export default function GrafoAcademico() {
 
     const handleAddMateriaToGraph = async () => {
         if (!graph) return;
-
         if (!selectedMateriaId) {
             alert("Debes seleccionar una materia.");
             return;
         }
-
-        await addMateriaToGraph(
-            graph.id,
-            selectedMateriaId,
-            selectedSemestre
-        );
-
+        await addMateriaToGraph(graph.id, selectedMateriaId, selectedSemestre);
         setSelectedMateriaId("");
         setSelectedSemestre(1);
     };
 
     const handleAddPrerequisite = async () => {
         if (!graph) return;
-
         if (!selectedGrafoMateriaId || !selectedPrerequisiteId) {
             alert("Debes seleccionar una materia y un prerrequisito.");
             return;
         }
-
-        await addPrerequisite(
-            selectedGrafoMateriaId,
-            selectedPrerequisiteId,
-            graph.id
-        );
-
+        await addPrerequisite(selectedGrafoMateriaId, selectedPrerequisiteId, graph.id);
         setSelectedGrafoMateriaId("");
         setSelectedPrerequisiteId("");
     };
 
     const handleDeleteGrafoMateria = async (gm: GrafoMateria) => {
         if (!graph) return;
-
         const materia = getMateriaInfo(gm.materiaId);
-
         const confirmDelete = confirm(
             `¿Seguro que quieres quitar ${materia?.nombre || "esta materia"} del pensum?`
         );
-
         if (!confirmDelete) return;
-
         await deleteGrafoMateria(gm.id, graph.id);
     };
 
@@ -244,23 +243,14 @@ export default function GrafoAcademico() {
 
     const handleEditGrafoMateria = async () => {
         if (!graph || !editingGrafoMateriaId) return;
-
-        await editGrafoMateria(
-            editingGrafoMateriaId,
-            graph.id,
-            editSemestre
-        );
-
+        await editGrafoMateria(editingGrafoMateriaId, graph.id, editSemestre);
         setEditingGrafoMateriaId(null);
     };
 
     const getGrafoMateriaName = (grafoMateriaId: string) => {
         const gm = grafoMaterias.find((item) => item.id === grafoMateriaId);
-
         if (!gm) return "Materia no encontrada";
-
         const materia = getMateriaInfo(gm.materiaId);
-
         return materia ? materia.nombre : "Materia no encontrada";
     };
 
@@ -270,475 +260,572 @@ export default function GrafoAcademico() {
         });
     };
 
+    // Estados de carga / error
     if (!pensumId) {
         return (
-            <div className="tasks-container">
-                <div className="tasks-card">
-                    <h3>No se encontró el pensum.</h3>
+            <>
+                <AdminNavbar />
+                <div className="grafo-academico__state">
+                    <div className="grafo-academico__state-card">
+                        <div className="grafo-academico__state-icon">📋</div>
+                        <h3>No se encontró el pensum.</h3>
+                        <p>El identificador de pensum no está disponible.</p>
+                    </div>
                 </div>
-            </div>
+            </>
         );
     }
 
     if (!pensum) {
         return (
-            <div className="tasks-container">
-                <div className="tasks-card">
-                    <h3>Cargando pensum...</h3>
+            <>
+                <AdminNavbar />
+                <div className="grafo-academico__state">
+                    <div className="grafo-academico__state-card">
+                        <div className="grafo-academico__spinner" />
+                        <h3>Cargando pensum...</h3>
+                        <p>Por favor espera mientras cargamos la información.</p>
+                    </div>
                 </div>
-            </div>
+            </>
         );
     }
 
     if (!carreraId) {
         return (
-            <div className="tasks-container">
-                <div className="tasks-card">
-                    <h3>Este pensum no tiene una carrera padre.</h3>
+            <>
+                <AdminNavbar />
+                <div className="grafo-academico__state">
+                    <div className="grafo-academico__state-card">
+                        <div className="grafo-academico__state-icon">⚠️</div>
+                        <h3>Este pensum no tiene una carrera padre.</h3>
+                        <p>Verifica la estructura del árbol académico.</p>
+                    </div>
                 </div>
-            </div>
+            </>
         );
     }
 
+    const availableToAssign = getAvailableMateriasToAssign();
+
+    // Render
     return (
-        <div className="tasks-container">
-            <div className="tasks-card">
-                <h3>📘 Grafo del pensum: {pensum.name}</h3>
+        <>
+            <AdminNavbar />
 
-                {carrera && (
-                    <p style={{ fontSize: "13px", opacity: 0.8 }}>
-                        Carrera: {carrera.name}
+            <div className="grafo-academico">
+                {/* ── Header ─────────────────────────────────────────────── */}
+                <div className="grafo-academico__header">
+                    <span className="grafo-academico__eyebrow">📘 Gestión académica</span>
+                    <h1 className="grafo-academico__title">{pensum.name}</h1>
+                    <p className="grafo-academico__subtitle">
+                        Administra el catálogo de materias y configura el pensum académico.
                     </p>
-                )}
 
-                {graph && (
-                    <p style={{ fontSize: "12px", opacity: 0.7 }}>
-                        ID del grafo: {graph.id}
-                    </p>
-                )}
-
-                <hr />
-
-                <h5>Crear materia para la carrera</h5>
-
-                <div className="input-group mb-3">
-                    <input
-                        className="form-control"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        placeholder="Nombre de la materia"
-                    />
-
-                    <input
-                        className="form-control"
-                        value={codigo}
-                        onChange={(e) => setCodigo(e.target.value)}
-                        placeholder="Código"
-                    />
-
-                    <input
-                        className="form-control"
-                        type="number"
-                        value={creditos}
-                        onChange={(e) => setCreditos(Number(e.target.value))}
-                        placeholder="Créditos"
-                    />
-                </div>
-
-                <h6>Grupos de la materia</h6>
-
-                <div className="input-group mb-2">
-                    <input
-                        className="form-control"
-                        value={grupoNombre}
-                        onChange={(e) => setGrupoNombre(e.target.value)}
-                        placeholder="Nombre del grupo. Ej: Grupo A"
-                    />
-
-                    <input
-                        className="form-control"
-                        type="number"
-                        value={grupoCupos}
-                        onChange={(e) => setGrupoCupos(Number(e.target.value))}
-                        placeholder="Cupos"
-                    />
-
-                    <button
-                        className="btn btn-secondary"
-                        onClick={addGrupoToForm}
-                    >
-                        Agregar grupo
-                    </button>
-                </div>
-
-                {grupos.length > 0 && (
-                    <div className="mb-3">
-                        {grupos.map((grupo, index) => (
-                            <span
-                                key={index}
-                                style={{ marginRight: "10px", fontSize: "13px" }}
-                            >
-                                {grupo.nombre} ({grupo.cupos} cupos)
-
-                                <button
-                                    className="btn btn-sm btn-outline-danger"
-                                    style={{ marginLeft: "5px" }}
-                                    onClick={() => removeGrupoFromForm(index)}
-                                >
-                                    x
-                                </button>
-                            </span>
-                        ))}
-                    </div>
-                )}
-
-                <button
-                    className="btn btn-primary mb-3"
-                    onClick={handleCreateMateria}
-                >
-                    Crear materia en la carrera
-                </button>
-
-                <hr />
-
-                <h5>Materias de la carrera</h5>
-
-                {materias.length === 0 && (
-                    <p style={{ opacity: 0.7 }}>
-                        Esta carrera todavía no tiene materias creadas.
-                    </p>
-                )}
-
-                {materias.map((materia) => (
-                    <div key={materia.id} className="task-item">
-                        <div className="left">
-                            <div>
-                                {editingMateriaId === materia.id ? (
-                                    <>
-                                        <div className="input-group mb-2">
-                                            <input
-                                                className="form-control"
-                                                value={editNombre}
-                                                onChange={(e) => setEditNombre(e.target.value)}
-                                                placeholder="Nombre"
-                                            />
-
-                                            <input
-                                                className="form-control"
-                                                value={editCodigo}
-                                                onChange={(e) => setEditCodigo(e.target.value)}
-                                                placeholder="Código"
-                                            />
-
-                                            <input
-                                                className="form-control"
-                                                type="number"
-                                                value={editCreditos}
-                                                onChange={(e) => setEditCreditos(Number(e.target.value))}
-                                                placeholder="Créditos"
-                                            />
-
-                                            <button
-                                                className="btn btn-success btn-sm"
-                                                onClick={handleEditMateriaCarrera}
-                                            >
-                                                💾
-                                            </button>
-                                        </div>
-
-                                        <p style={{ margin: 0, fontSize: "13px" }}>
-                                            Grupos:
-                                        </p>
-
-                                        {editGrupos.length === 0 && (
-                                            <p style={{ margin: 0, fontSize: "13px", opacity: 0.7 }}>
-                                                Sin grupos
-                                            </p>
-                                        )}
-
-                                        {editGrupos.map((grupo, index) => (
-                                            <span
-                                                key={index}
-                                                style={{ marginRight: "10px", fontSize: "13px" }}
-                                            >
-                                                {grupo.nombre} ({grupo.cupos} cupos)
-
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    style={{ marginLeft: "5px" }}
-                                                    onClick={() => removeGrupoFromEditMateria(index)}
-                                                >
-                                                    x
-                                                </button>
-                                            </span>
-                                        ))}
-
-                                        <button
-                                            className="btn btn-sm btn-secondary"
-                                            style={{ marginLeft: "8px" }}
-                                            onClick={addGrupoToEditMateria}
-                                        >
-                                            Agregar grupo
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <strong>
-                                            {materia.codigo} - {materia.nombre}
-                                        </strong>
-
-                                        <p style={{ margin: 0, fontSize: "13px" }}>
-                                            Créditos: {materia.creditos}
-                                        </p>
-
-                                        <p style={{ margin: 0, fontSize: "13px" }}>
-                                            Grupos:{" "}
-                                            {materia.grupos && materia.grupos.length > 0
-                                                ? materia.grupos
-                                                    .map((grupo) => `${grupo.nombre} (${grupo.cupos} cupos)`)
-                                                    .join(", ")
-                                                : "Sin grupos"}
-                                        </p>
-                                    </>
-                                )}
+                    <div className="grafo-academico__meta">
+                        {carrera && (
+                            <div className="grafo-academico__meta-item">
+                                <span className="grafo-academico__meta-dot" />
+                                Carrera: <strong>{carrera.name}</strong>
                             </div>
+                        )}
+                        <div className="grafo-academico__meta-item">
+                            <span className="grafo-academico__meta-dot" />
+                            Materias en catálogo: <strong>{materias.length}</strong>
                         </div>
-
-                        <div className="actions">
-                            {editingMateriaId === materia.id ? (
-                                <button
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={() => setEditingMateriaId(null)}
-                                >
-                                    Cancelar
-                                </button>
-                            ) : (
-                                <button
-                                    className="btn btn-warning btn-sm"
-                                    onClick={() => startEditingMateria(materia)}
-                                >
-                                    ✏️
-                                </button>
-                            )}
-
-                            <button
-                                className="btn btn-danger btn-sm"
-                                onClick={() => handleDeleteMateriaCarrera(materia.id)}
-                            >
-                                Eliminar
-                            </button>
+                        <div className="grafo-academico__meta-item">
+                            <span className="grafo-academico__meta-dot" />
+                            Materias en pensum: <strong>{grafoMaterias.length}</strong>
                         </div>
                     </div>
-                ))}
-
-                <hr />
-
-                <h5>Asignar materia al pensum</h5>
-
-                <div className="input-group mb-3">
-                    <select
-                        className="form-select"
-                        value={selectedMateriaId}
-                        onChange={(e) => setSelectedMateriaId(e.target.value)}
-                    >
-                        <option value="">Materia de la carrera</option>
-
-                        {getAvailableMateriasToAssign().map((materia) => (
-                            <option key={materia.id} value={materia.id}>
-                                {materia.codigo} - {materia.nombre}
-                            </option>
-                        ))}
-                    </select>
-
-                    <input
-                        className="form-control"
-                        type="number"
-                        value={selectedSemestre}
-                        onChange={(e) => setSelectedSemestre(Number(e.target.value))}
-                        placeholder="Semestre"
-                    />
-
-                    <button
-                        className="btn btn-success"
-                        onClick={handleAddMateriaToGraph}
-                    >
-                        Asignar al pensum
-                    </button>
                 </div>
 
-                <hr />
+                {/* ── Layout dos columnas ─────────────────────────────────── */}
+                <div className="grafo-academico__layout">
 
-                <h5>Asignar prerrequisito</h5>
+                    {/* ════════════════════════════════════════════════════
+                        SECCIÓN 1 — Catálogo de materias de la carrera
+                    ════════════════════════════════════════════════════ */}
+                    <section className="grafo-academico__section">
+                        <div className="grafo-academico__section-header">
+                            <h2><IconBook /> Materias de la carrera</h2>
+                            <p>Crea y administra las materias generales disponibles para esta carrera.</p>
+                        </div>
 
-                <div className="input-group mb-3">
-                    <select
-                        className="form-select"
-                        value={selectedGrafoMateriaId}
-                        onChange={(e) => setSelectedGrafoMateriaId(e.target.value)}
-                    >
-                        <option value="">Materia del pensum</option>
+                        <div className="grafo-academico__section-body">
 
-                        {grafoMaterias.map((gm) => {
-                            const materia = getMateriaInfo(gm.materiaId);
+                            {/* ── Formulario crear materia ──────────────── */}
+                            <div className="grafo-academico__block">
+                                <h3>Nueva materia</h3>
 
-                            return (
-                                <option key={gm.id} value={gm.id}>
-                                    {materia?.nombre || "Materia no encontrada"}
-                                </option>
-                            );
-                        })}
-                    </select>
-
-                    <select
-                        className="form-select"
-                        value={selectedPrerequisiteId}
-                        onChange={(e) => setSelectedPrerequisiteId(e.target.value)}
-                    >
-                        <option value="">Prerrequisito</option>
-
-                        {grafoMaterias
-                            .filter((gm) => gm.id !== selectedGrafoMateriaId)
-                            .map((gm) => {
-                                const materia = getMateriaInfo(gm.materiaId);
-
-                                return (
-                                    <option key={gm.id} value={gm.id}>
-                                        {materia?.nombre || "Materia no encontrada"}
-                                    </option>
-                                );
-                            })}
-                    </select>
-
-                    <button
-                        className="btn btn-success"
-                        onClick={handleAddPrerequisite}
-                    >
-                        Agregar prerrequisito
-                    </button>
-                </div>
-
-                <hr />
-
-                <h5>Materias asignadas al pensum</h5>
-
-                {grafoMaterias.length === 0 && (
-                    <p style={{ opacity: 0.7 }}>
-                        Este pensum todavía no tiene materias asignadas.
-                    </p>
-                )}
-
-                {grafoMaterias.map((gm) => {
-                    const materia = getMateriaInfo(gm.materiaId);
-
-                    return (
-                        <div key={gm.id} className="task-item">
-                            <div className="left">
-                                <div>
-                                    <strong>
-                                        {materia
-                                            ? `${materia.codigo} - ${materia.nombre}`
-                                            : "Materia no encontrada"}
-                                    </strong>
-
-                                    {editingGrafoMateriaId === gm.id ? (
-                                        <div className="input-group mt-2 mb-2">
+                                <div className="grafo-academico__form">
+                                    <div className="grafo-academico__form-row--three grafo-academico__form-row">
+                                        <div className="grafo-academico__field">
+                                            <label>Nombre de la materia</label>
                                             <input
-                                                className="form-control"
-                                                type="number"
-                                                value={editSemestre}
-                                                onChange={(e) => setEditSemestre(Number(e.target.value))}
+                                                value={nombre}
+                                                onChange={(e) => setNombre(e.target.value)}
+                                                placeholder="Ej: Cálculo Diferencial"
                                             />
-
-                                            <button
-                                                className="btn btn-success btn-sm"
-                                                onClick={handleEditGrafoMateria}
-                                            >
-                                                💾
-                                            </button>
                                         </div>
-                                    ) : (
-                                        <p style={{ margin: 0, fontSize: "13px" }}>
-                                            Semestre: {gm.semestre}
-                                        </p>
-                                    )}
+                                        <div className="grafo-academico__field">
+                                            <label>Código</label>
+                                            <input
+                                                value={codigo}
+                                                onChange={(e) => setCodigo(e.target.value)}
+                                                placeholder="Ej: MAT101"
+                                            />
+                                        </div>
+                                        <div className="grafo-academico__field">
+                                            <label>Créditos</label>
+                                            <input
+                                                type="number"
+                                                value={creditos}
+                                                onChange={(e) => setCreditos(Number(e.target.value))}
+                                                placeholder="3"
+                                                min={1}
+                                            />
+                                        </div>
+                                    </div>
 
-                                    {materia && (
-                                        <>
-                                            <p style={{ margin: 0, fontSize: "13px" }}>
-                                                Créditos: {materia.creditos}
-                                            </p>
+                                    {/* Agregar grupo */}
+                                    <div className="grafo-academico__grupo-row">
+                                        <div className="grafo-academico__field">
+                                            <label>Nombre del grupo</label>
+                                            <input
+                                                value={grupoNombre}
+                                                onChange={(e) => setGrupoNombre(e.target.value)}
+                                                placeholder="Ej: Grupo A"
+                                            />
+                                        </div>
+                                        <div className="grafo-academico__field">
+                                            <label>Cupos</label>
+                                            <input
+                                                type="number"
+                                                value={grupoCupos}
+                                                onChange={(e) => setGrupoCupos(Number(e.target.value))}
+                                                placeholder="30"
+                                                min={1}
+                                            />
+                                        </div>
+                                        <button
+                                            className="grafo-academico__btn grafo-academico__btn--outline grafo-academico__btn--sm"
+                                            onClick={addGrupoToForm}
+                                            title="Agregar grupo"
+                                        >
+                                            <IconPlus /> Agregar
+                                        </button>
+                                    </div>
 
-                                            <p style={{ margin: 0, fontSize: "13px" }}>
-                                                Grupos:{" "}
-                                                {materia.grupos && materia.grupos.length > 0
-                                                    ? materia.grupos
-                                                        .map((grupo) => `${grupo.nombre} (${grupo.cupos} cupos)`)
-                                                        .join(", ")
-                                                    : "Sin grupos"}
-                                            </p>
-                                        </>
-                                    )}
-
-                                    <p style={{ margin: 0, fontSize: "13px" }}>
-                                        Prerrequisitos:{" "}
-                                        {gm.prerequisitesId.length === 0
-                                            ? "Ninguno"
-                                            : gm.prerequisitesId.map((id) => (
-                                                <span key={id}>
-                                                    {getGrafoMateriaName(id)}
-
-                                                    <button
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        style={{
-                                                            marginLeft: "5px",
-                                                            marginRight: "8px",
-                                                        }}
-                                                        onClick={() => {
-                                                            if (!graph) return;
-
-                                                            removePrerequisite(
-                                                                gm.id,
-                                                                id,
-                                                                graph.id
-                                                            );
-                                                        }}
-                                                    >
-                                                        x
+                                    {/* Lista de grupos */}
+                                    {grupos.length > 0 ? (
+                                        <div className="grafo-academico__groups">
+                                            {grupos.map((grupo, index) => (
+                                                <span key={index} className="grafo-academico__group-chip">
+                                                    {grupo.nombre} · {grupo.cupos} cupos
+                                                    <button onClick={() => removeGrupoFromForm(index)} title="Quitar grupo">
+                                                        <IconX />
                                                     </button>
                                                 </span>
                                             ))}
-                                    </p>
+                                        </div>
+                                    ) : (
+                                        <p className="grafo-academico__groups-hint">
+                                            Agrega al menos un grupo si deseas manejar cupos por grupo.
+                                        </p>
+                                    )}
+
+                                    <button
+                                        className="grafo-academico__btn grafo-academico__btn--primary"
+                                        onClick={handleCreateMateria}
+                                    >
+                                        <IconPlus /> Crear materia
+                                    </button>
                                 </div>
                             </div>
 
-                            <div className="actions">
-                                {editingGrafoMateriaId === gm.id ? (
-                                    <button
-                                        className="btn btn-secondary btn-sm"
-                                        onClick={() => setEditingGrafoMateriaId(null)}
-                                    >
-                                        Cancelar
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="btn btn-warning btn-sm"
-                                        onClick={() => startEditingGrafoMateria(gm)}
-                                    >
-                                        ✏️
-                                    </button>
-                                )}
+                            {/* ── Catálogo de materias ─────────────────── */}
+                            <div className="grafo-academico__block">
+                                <h3>Catálogo ({materias.length})</h3>
 
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => handleDeleteGrafoMateria(gm)}
-                                >
-                                    Quitar del pensum
-                                </button>
+                                {materias.length === 0 ? (
+                                    <div className="grafo-academico__empty">
+                                        <IconEmpty />
+                                        <p>Esta carrera todavía no tiene materias creadas.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grafo-academico__catalog">
+                                        {materias.map((materia) => (
+                                            <div
+                                                key={materia.id}
+                                                className={`grafo-academico__subject-card${editingMateriaId === materia.id ? " grafo-academico__subject-card--editing" : ""}`}
+                                            >
+                                                <div className="grafo-academico__subject-main">
+                                                    {editingMateriaId === materia.id ? (
+                                                        <>
+                                                            <div className="grafo-academico__edit-row">
+                                                                <div className="grafo-academico__field">
+                                                                    <label>Nombre</label>
+                                                                    <input
+                                                                        value={editNombre}
+                                                                        onChange={(e) => setEditNombre(e.target.value)}
+                                                                        placeholder="Nombre"
+                                                                    />
+                                                                </div>
+                                                                <div className="grafo-academico__field">
+                                                                    <label>Código</label>
+                                                                    <input
+                                                                        value={editCodigo}
+                                                                        onChange={(e) => setEditCodigo(e.target.value)}
+                                                                        placeholder="Código"
+                                                                    />
+                                                                </div>
+                                                                <div className="grafo-academico__field">
+                                                                    <label>Créditos</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={editCreditos}
+                                                                        onChange={(e) => setEditCreditos(Number(e.target.value))}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Grupos en edición */}
+                                                            <div className="grafo-academico__groups" style={{ marginTop: "0.4rem" }}>
+                                                                {editGrupos.length === 0 && (
+                                                                    <p className="grafo-academico__groups-hint">Sin grupos.</p>
+                                                                )}
+                                                                {editGrupos.map((grupo, index) => (
+                                                                    <span key={index} className="grafo-academico__group-chip">
+                                                                        {grupo.nombre} · {grupo.cupos} cupos
+                                                                        <button onClick={() => removeGrupoFromEditMateria(index)} title="Quitar grupo">
+                                                                            <IconX />
+                                                                        </button>
+                                                                    </span>
+                                                                ))}
+                                                                <button
+                                                                    className="grafo-academico__btn grafo-academico__btn--outline grafo-academico__btn--sm"
+                                                                    onClick={addGrupoToEditMateria}
+                                                                >
+                                                                    <IconPlus /> Grupo
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="grafo-academico__subject-meta">
+                                                                <span className="grafo-academico__subject-code">{materia.codigo}</span>
+                                                                <span className="grafo-academico__subject-name">{materia.nombre}</span>
+                                                                <span className="grafo-academico__subject-credits">{materia.creditos} crédito{materia.creditos !== 1 ? "s" : ""}</span>
+                                                            </div>
+                                                            <div className="grafo-academico__subject-groups">
+                                                                {materia.grupos && materia.grupos.length > 0 ? (
+                                                                    materia.grupos.map((grupo, i) => (
+                                                                        <span key={i} className="grafo-academico__group-chip">
+                                                                            {grupo.nombre} · {grupo.cupos} cupos
+                                                                        </span>
+                                                                    ))
+                                                                ) : (
+                                                                    <span className="grafo-academico__groups-hint">Sin grupos</span>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                <div className="grafo-academico__actions">
+                                                    {editingMateriaId === materia.id ? (
+                                                        <>
+                                                            <button
+                                                                className="grafo-academico__btn grafo-academico__btn--save grafo-academico__btn--sm"
+                                                                onClick={handleEditMateriaCarrera}
+                                                            >
+                                                                <IconSave /> Guardar
+                                                            </button>
+                                                            <button
+                                                                className="grafo-academico__btn grafo-academico__btn--secondary grafo-academico__btn--sm"
+                                                                onClick={() => setEditingMateriaId(null)}
+                                                            >
+                                                                Cancelar
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button
+                                                                className="grafo-academico__btn grafo-academico__btn--edit grafo-academico__btn--sm"
+                                                                onClick={() => startEditingMateria(materia)}
+                                                                title="Editar materia"
+                                                            >
+                                                                <IconEdit /> Editar
+                                                            </button>
+                                                            <button
+                                                                className="grafo-academico__btn grafo-academico__btn--danger grafo-academico__btn--sm"
+                                                                onClick={() => handleDeleteMateriaCarrera(materia.id)}
+                                                                title="Eliminar materia"
+                                                            >
+                                                                <IconTrash /> Eliminar
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    );
-                })}
+                    </section>
+
+                    {/* ════════════════════════════════════════════════════
+                        SECCIÓN 2 — Configuración del pensum
+                    ════════════════════════════════════════════════════ */}
+                    <section className="grafo-academico__section">
+                        <div className="grafo-academico__section-header">
+                            <h2><IconLayout /> Configuración del pensum</h2>
+                            <p>Asigna materias al pensum, define semestres y establece prerrequisitos.</p>
+                        </div>
+
+                        <div className="grafo-academico__section-body">
+
+                            {/* Info strip */}
+                            <div className="grafo-academico__info-strip">
+                                <span>Pensum: <strong>{pensum.name}</strong></span>
+                                {carrera && <span>Carrera: <strong>{carrera.name}</strong></span>}
+                            </div>
+
+                            {/* ── Asignar materia al pensum ─────────────── */}
+                            <div className="grafo-academico__block">
+                                <h3>Asignar materia al pensum</h3>
+
+                                <div className="grafo-academico__form">
+                                    <div className="grafo-academico__form-row">
+                                        <div className="grafo-academico__field">
+                                            <label>Materia de la carrera</label>
+                                            <select
+                                                value={selectedMateriaId}
+                                                onChange={(e) => setSelectedMateriaId(e.target.value)}
+                                            >
+                                                <option value="">Seleccionar materia…</option>
+                                                {availableToAssign.map((materia) => (
+                                                    <option key={materia.id} value={materia.id}>
+                                                        {materia.codigo} — {materia.nombre}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="grafo-academico__field">
+                                            <label>Semestre</label>
+                                            <input
+                                                type="number"
+                                                value={selectedSemestre}
+                                                onChange={(e) => setSelectedSemestre(Number(e.target.value))}
+                                                placeholder="1"
+                                                min={1}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {availableToAssign.length === 0 && (
+                                        <p className="grafo-academico__groups-hint">
+                                            No hay materias disponibles para asignar o todas ya fueron agregadas al pensum.
+                                        </p>
+                                    )}
+
+                                    <button
+                                        className="grafo-academico__btn grafo-academico__btn--save"
+                                        onClick={handleAddMateriaToGraph}
+                                        disabled={availableToAssign.length === 0}
+                                    >
+                                        <IconPlus /> Asignar al pensum
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* ── Asignar prerrequisito ─────────────────── */}
+                            <div className="grafo-academico__block">
+                                <h3>Asignar prerrequisito</h3>
+
+                                <div className="grafo-academico__form">
+                                    <div className="grafo-academico__form-row">
+                                        <div className="grafo-academico__field">
+                                            <label>Materia del pensum</label>
+                                            <select
+                                                value={selectedGrafoMateriaId}
+                                                onChange={(e) => setSelectedGrafoMateriaId(e.target.value)}
+                                            >
+                                                <option value="">Seleccionar materia…</option>
+                                                {grafoMaterias.map((gm) => {
+                                                    const materia = getMateriaInfo(gm.materiaId);
+                                                    return (
+                                                        <option key={gm.id} value={gm.id}>
+                                                            {materia?.nombre || "Materia no encontrada"}
+                                                        </option>
+                                                    );
+                                                })}
+                                            </select>
+                                        </div>
+                                        <div className="grafo-academico__field">
+                                            <label>Prerrequisito</label>
+                                            <select
+                                                value={selectedPrerequisiteId}
+                                                onChange={(e) => setSelectedPrerequisiteId(e.target.value)}
+                                            >
+                                                <option value="">Seleccionar prerrequisito…</option>
+                                                {grafoMaterias
+                                                    .filter((gm) => gm.id !== selectedGrafoMateriaId)
+                                                    .map((gm) => {
+                                                        const materia = getMateriaInfo(gm.materiaId);
+                                                        return (
+                                                            <option key={gm.id} value={gm.id}>
+                                                                {materia?.nombre || "Materia no encontrada"}
+                                                            </option>
+                                                        );
+                                                    })}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className="grafo-academico__btn grafo-academico__btn--primary"
+                                        onClick={handleAddPrerequisite}
+                                    >
+                                        <IconPlus /> Agregar prerrequisito
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* ── Materias asignadas al pensum ─────────── */}
+                            <div className="grafo-academico__block">
+                                <h3>Materias en el pensum ({grafoMaterias.length})</h3>
+
+                                {grafoMaterias.length === 0 ? (
+                                    <div className="grafo-academico__empty">
+                                        <IconEmpty />
+                                        <p>Este pensum todavía no tiene materias asignadas.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grafo-academico__catalog">
+                                        {grafoMaterias.map((gm) => {
+                                            const materia = getMateriaInfo(gm.materiaId);
+
+                                            return (
+                                                <div
+                                                    key={gm.id}
+                                                    className={`grafo-academico__pensum-card${editingGrafoMateriaId === gm.id ? " grafo-academico__pensum-card--editing" : ""}`}
+                                                >
+                                                    <div className="grafo-academico__pensum-main">
+                                                        {/* Encabezado de la materia */}
+                                                        {materia ? (
+                                                            <div className="grafo-academico__subject-meta">
+                                                                <span className="grafo-academico__subject-code">{materia.codigo}</span>
+                                                                <span className="grafo-academico__subject-name">{materia.nombre}</span>
+                                                                <span className="grafo-academico__subject-credits">{materia.creditos} crédito{materia.creditos !== 1 ? "s" : ""}</span>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="grafo-academico__subject-name">Materia no encontrada</span>
+                                                        )}
+
+                                                        {/* Semestre editable */}
+                                                        {editingGrafoMateriaId === gm.id ? (
+                                                            <div className="grafo-academico__edit-semester-row">
+                                                                <div className="grafo-academico__field">
+                                                                    <label>Semestre</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={editSemestre}
+                                                                        onChange={(e) => setEditSemestre(Number(e.target.value))}
+                                                                        min={1}
+                                                                    />
+                                                                </div>
+                                                                <button
+                                                                    className="grafo-academico__btn grafo-academico__btn--save grafo-academico__btn--sm"
+                                                                    onClick={handleEditGrafoMateria}
+                                                                    title="Guardar semestre"
+                                                                >
+                                                                    <IconSave />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <p className="grafo-academico__subject-semester">
+                                                                Semestre: <strong>{gm.semestre}</strong>
+                                                            </p>
+                                                        )}
+
+                                                        {/* Grupos */}
+                                                        {materia && (
+                                                            <div className="grafo-academico__subject-groups" style={{ marginTop: "0.35rem" }}>
+                                                                {materia.grupos && materia.grupos.length > 0
+                                                                    ? materia.grupos.map((grupo, i) => (
+                                                                        <span key={i} className="grafo-academico__group-chip">
+                                                                            {grupo.nombre} · {grupo.cupos} cupos
+                                                                        </span>
+                                                                    ))
+                                                                    : <span className="grafo-academico__groups-hint">Sin grupos</span>
+                                                                }
+                                                            </div>
+                                                        )}
+
+                                                        {/* Prerrequisitos */}
+                                                        <div className="grafo-academico__pensum-prereqs">
+                                                            <label>Prerrequisitos</label>
+                                                            {gm.prerequisitesId.length === 0 ? (
+                                                                <p className="grafo-academico__groups-hint">Sin prerrequisitos.</p>
+                                                            ) : (
+                                                                <div className="grafo-academico__groups">
+                                                                    {gm.prerequisitesId.map((id) => (
+                                                                        <span key={id} className="grafo-academico__prerequisite-chip">
+                                                                            {getGrafoMateriaName(id)}
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    if (!graph) return;
+                                                                                    removePrerequisite(gm.id, id, graph.id);
+                                                                                }}
+                                                                                title="Quitar prerrequisito"
+                                                                            >
+                                                                                <IconX />
+                                                                            </button>
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grafo-academico__actions">
+                                                        {editingGrafoMateriaId === gm.id ? (
+                                                            <button
+                                                                className="grafo-academico__btn grafo-academico__btn--secondary grafo-academico__btn--sm"
+                                                                onClick={() => setEditingGrafoMateriaId(null)}
+                                                            >
+                                                                Cancelar
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                className="grafo-academico__btn grafo-academico__btn--edit grafo-academico__btn--sm"
+                                                                onClick={() => startEditingGrafoMateria(gm)}
+                                                                title="Editar semestre"
+                                                            >
+                                                                <IconEdit /> Semestre
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            className="grafo-academico__btn grafo-academico__btn--danger grafo-academico__btn--sm"
+                                                            onClick={() => handleDeleteGrafoMateria(gm)}
+                                                            title="Quitar del pensum"
+                                                        >
+                                                            <IconTrash /> Quitar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -1,0 +1,759 @@
+// ─── Variables ──────────────────────────────────────────────────────────────
+$purple:        #7C3AED;
+$purple-dark:   #5B21B6;
+$purple-light:  #EDE9FE;
+$purple-pale:   #F5F3FF;
+$text-dark:     #111827;
+$text-mid:      #374151;
+$text-soft:     #4B5563;
+$text-muted:    #9CA3AF;
+$border:        #E5E7EB;
+$border-mid:    #D1D5DB;
+$bg:            #FFFFFF;
+$bg-soft:       #F9FAFB;
+$bg-section:    #F3F4F6;
+$green:         #059669;
+$green-bg:      #ECFDF5;
+$green-border:  #A7F3D0;
+$red:           #DC2626;
+$red-bg:        #FEF2F2;
+$red-border:    #FECACA;
+$amber:         #D97706;
+$amber-bg:      #FFFBEB;
+$amber-border:  #FDE68A;
+$font:          'Montserrat', 'Segoe UI', sans-serif;
+$radius:        12px;
+$radius-sm:     8px;
+$shadow:        0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+$shadow-card:   0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.06);
+
+// ─── Keyframes ──────────────────────────────────────────────────────────────
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── Page wrapper ────────────────────────────────────────────────────────────
+.grafo-academico {
+  font-family: $font;
+  min-height: 100vh;
+  background: $bg-soft;
+  padding-bottom: 4rem;
+  animation: fadeSlideUp 0.35s ease both;
+
+  // ── Header ────────────────────────────────────────────────────────────────
+  &__header {
+    background: $bg;
+    border-bottom: 1px solid $border;
+    padding: 2.5rem 2.5rem 2rem;
+
+    @media (max-width: 768px) {
+      padding: 1.5rem 1.25rem 1.25rem;
+    }
+  }
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $purple;
+    background: $purple-light;
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 0.4rem;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 1.45rem;
+    }
+  }
+
+  &__subtitle {
+    font-size: 0.92rem;
+    color: $text-soft;
+    margin: 0;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1.25rem;
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: $text-soft;
+
+    strong {
+      color: $text-dark;
+      font-weight: 600;
+    }
+
+    span.grafo-academico__meta-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: $purple;
+      flex-shrink: 0;
+    }
+  }
+
+  &__meta-id {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: $text-muted;
+    background: $bg-section;
+    border: 1px solid $border;
+    border-radius: 5px;
+    padding: 1px 6px;
+  }
+
+  // ── Layout ────────────────────────────────────────────────────────────────
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+    max-width: 1400px;
+    margin: 2rem auto 0;
+    padding: 0 2.5rem;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 768px) {
+      padding: 0 1rem;
+      margin-top: 1.25rem;
+    }
+  }
+
+  // ── Section card ──────────────────────────────────────────────────────────
+  &__section {
+    background: $bg;
+    border-radius: $radius;
+    border: 1px solid $border;
+    box-shadow: $shadow-card;
+    overflow: hidden;
+    animation: fadeSlideUp 0.4s ease both;
+
+    &:nth-child(2) { animation-delay: 0.07s; }
+  }
+
+  &__section-header {
+    padding: 1.4rem 1.5rem 1.1rem;
+    border-bottom: 1px solid $border;
+    background: $bg;
+
+    h2 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0 0 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      svg { color: $purple; flex-shrink: 0; }
+    }
+
+    p {
+      font-size: 0.82rem;
+      color: $text-soft;
+      margin: 0;
+    }
+  }
+
+  &__section-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  // ── Sub-blocks ────────────────────────────────────────────────────────────
+  &__block {
+    background: $bg-soft;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 1.25rem 1.25rem 1rem;
+    animation: popIn 0.25s ease both;
+
+    h3 {
+      font-size: 0.87rem;
+      font-weight: 700;
+      color: $text-mid;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin: 0 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+
+      &::before {
+        content: '';
+        width: 3px;
+        height: 14px;
+        background: $purple;
+        border-radius: 2px;
+        display: inline-block;
+      }
+    }
+  }
+
+  // ── Form fields ───────────────────────────────────────────────────────────
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+
+    @media (max-width: 540px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__form-row--three {
+    grid-template-columns: 2fr 1fr 1fr;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 420px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $text-mid;
+      letter-spacing: 0.02em;
+    }
+
+    input, select {
+      font-family: $font;
+      font-size: 0.88rem;
+      color: $text-dark;
+      background: $bg;
+      border: 1.5px solid $border-mid;
+      border-radius: $radius-sm;
+      padding: 0.55rem 0.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+
+      &:focus {
+        border-color: $purple;
+        box-shadow: 0 0 0 3px rgba($purple, 0.12);
+      }
+
+      &::placeholder { color: $text-muted; }
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2.25rem;
+    }
+  }
+
+  // ── Groups row (add grupo inline) ─────────────────────────────────────────
+  &__grupo-row {
+    display: grid;
+    grid-template-columns: 1fr 90px auto;
+    gap: 0.65rem;
+    align-items: flex-end;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr 80px auto;
+    }
+  }
+
+  // ── Group chips ───────────────────────────────────────────────────────────
+  &__groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 24px;
+  }
+
+  &__group-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: $purple-dark;
+    background: $purple-light;
+    border: 1px solid rgba($purple, 0.25);
+    border-radius: 20px;
+    padding: 0.2rem 0.55rem 0.2rem 0.7rem;
+    animation: popIn 0.18s ease both;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $red;
+      font-size: 0.9rem;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+
+      &:hover { opacity: 1; }
+    }
+  }
+
+  // ── Prerequisite chips ────────────────────────────────────────────────────
+  &__prerequisite-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: $amber;
+    background: $amber-bg;
+    border: 1px solid $amber-border;
+    border-radius: 20px;
+    padding: 0.18rem 0.5rem 0.18rem 0.65rem;
+    animation: popIn 0.18s ease both;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $red;
+      font-size: 0.85rem;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.65;
+      transition: opacity 0.15s;
+
+      &:hover { opacity: 1; }
+    }
+  }
+
+  // ── Subject cards (catálogo) ───────────────────────────────────────────────
+  &__catalog {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__subject-card {
+    background: $bg;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: fadeSlideUp 0.25s ease both;
+
+    &:hover {
+      border-color: rgba($purple, 0.3);
+      box-shadow: 0 2px 10px rgba($purple, 0.06);
+    }
+
+    &--editing {
+      border-color: $purple;
+      box-shadow: 0 0 0 3px rgba($purple, 0.1);
+    }
+
+    @media (max-width: 540px) {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  &__subject-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__subject-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+
+  &__subject-code {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $purple;
+    background: $purple-light;
+    border-radius: 5px;
+    padding: 1px 7px;
+  }
+
+  &__subject-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+
+  &__subject-credits {
+    font-size: 0.78rem;
+    color: $text-muted;
+    font-weight: 500;
+  }
+
+  &__subject-groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+
+  &__subject-semester {
+    font-size: 0.8rem;
+    color: $text-soft;
+    margin-top: 0.25rem;
+
+    strong { color: $text-dark; font-weight: 600; }
+  }
+
+  // ── Pensum subject cards ──────────────────────────────────────────────────
+  &__pensum-card {
+    background: $bg;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: fadeSlideUp 0.25s ease both;
+
+    &:hover {
+      border-color: rgba($purple, 0.3);
+      box-shadow: 0 2px 10px rgba($purple, 0.06);
+    }
+
+    &--editing {
+      border-color: $purple;
+      box-shadow: 0 0 0 3px rgba($purple, 0.1);
+    }
+
+    @media (max-width: 540px) {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  &__pensum-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__pensum-prereqs {
+    margin-top: 0.5rem;
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+  }
+
+  // ── Edit inline fields ────────────────────────────────────────────────────
+  &__edit-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 0.5rem;
+    align-items: flex-end;
+    margin-bottom: 0.5rem;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__edit-semester-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    align-items: flex-end;
+    margin-top: 0.4rem;
+    max-width: 200px;
+  }
+
+  // ── Actions ───────────────────────────────────────────────────────────────
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex-shrink: 0;
+    align-items: flex-end;
+
+    @media (max-width: 540px) {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  // ── Buttons ───────────────────────────────────────────────────────────────
+  &__btn {
+    font-family: $font;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    padding: 0.5rem 1.1rem;
+    transition: background 0.18s, transform 0.13s, box-shadow 0.18s;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    &:active { transform: scale(0.97); }
+
+    &--primary {
+      background: $purple;
+      color: #fff;
+
+      &:hover {
+        background: $purple-dark;
+        box-shadow: 0 4px 14px rgba($purple, 0.3);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--secondary {
+      background: $bg-section;
+      color: $text-mid;
+      border: 1px solid $border-mid;
+
+      &:hover {
+        background: darken($bg-section, 4%);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--save {
+      background: $green-bg;
+      color: $green;
+      border: 1.5px solid $green-border;
+
+      &:hover {
+        background: darken($green-bg, 4%);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--danger {
+      background: $red-bg;
+      color: $red;
+      border: 1.5px solid $red-border;
+
+      &:hover {
+        background: darken($red-bg, 3%);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--edit {
+      background: $amber-bg;
+      color: $amber;
+      border: 1.5px solid $amber-border;
+
+      &:hover {
+        background: darken($amber-bg, 4%);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--outline {
+      background: transparent;
+      color: $purple;
+      border: 1.5px solid rgba($purple, 0.4);
+
+      &:hover {
+        background: $purple-pale;
+        border-color: $purple;
+      }
+    }
+
+    &--sm {
+      font-size: 0.76rem;
+      padding: 0.35rem 0.75rem;
+    }
+
+    &--icon {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  // ── Empty states ──────────────────────────────────────────────────────────
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.75rem 1rem;
+    text-align: center;
+    color: $text-muted;
+    background: $bg-soft;
+    border: 1.5px dashed $border-mid;
+    border-radius: $radius-sm;
+
+    svg { opacity: 0.4; }
+
+    p {
+      font-size: 0.84rem;
+      margin: 0;
+      max-width: 260px;
+    }
+  }
+
+  // ── Loading / error states ────────────────────────────────────────────────
+  &__state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem;
+  }
+
+  &__state-card {
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: $radius;
+    box-shadow: $shadow;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    animation: popIn 0.3s ease both;
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0.75rem 0 0.35rem;
+    }
+
+    p {
+      font-size: 0.88rem;
+      color: $text-soft;
+      margin: 0;
+    }
+  }
+
+  &__state-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: $purple-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    font-size: 1.4rem;
+  }
+
+  &__spinner {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid $purple-light;
+    border-top-color: $purple;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 0.75rem;
+  }
+
+  // ── Divider ───────────────────────────────────────────────────────────────
+  &__divider {
+    border: none;
+    border-top: 1px solid $border;
+    margin: 0.25rem 0;
+  }
+
+  // ── Info strip ────────────────────────────────────────────────────────────
+  &__info-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    padding: 0.75rem 1rem;
+    background: $purple-pale;
+    border: 1px solid rgba($purple, 0.15);
+    border-radius: $radius-sm;
+    font-size: 0.82rem;
+    color: $text-soft;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      strong { color: $purple-dark; font-weight: 600; }
+    }
+  }
+
+  // ── Groups empty hint ─────────────────────────────────────────────────────
+  &__groups-hint {
+    font-size: 0.78rem;
+    color: $text-muted;
+    font-style: italic;
+    margin: 0;
+  }
+}
