@@ -33,7 +33,7 @@ export default function Home() {
               Ejemplos: "/estudiante.png"  "/img/student.jpg"
             */}
             <img
-              src="/student.png"
+              src="/student2.png"
               alt="Estudiante universitario"
               className="home__hero-img"
             />

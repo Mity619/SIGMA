@@ -6,12 +6,14 @@ import SignIn from "./Pages/SignIn";
 import DashboardAdmin from "./Pages/DashboardAdmin";
 import ArbolAcademico from "./Pages/ArbolAcademico";
 import Home from "./Pages/Home"
+import About from "./Pages/About";
 
 function App() {  
     return (  
         <Routes>
             <Route path="/SignUp" element={<SignUp/>} />
             <Route path="/SignIn" element={<SignIn/>} />
+            <Route path="/About" element={<About/>} />
             <Route path="/" element={<Home/>} />
 
             <Route element={<AdminRoute/>}>
