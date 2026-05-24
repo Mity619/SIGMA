@@ -1,0 +1,101 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './SCSS/AdminNavbar.scss';
+
+export default function AdminNavbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLogout = () => {
+    // TODO: Conectar aquí el logout real de Firebase o del AuthContext
+    // Ejemplo con Firebase:
+    //   import { signOut } from 'firebase/auth';
+    //   import { auth } from '../../firebase';
+    //   signOut(auth).then(() => navigate('/'));
+    //
+    // Ejemplo con AuthContext:
+    //   const { logout } = useAuth();
+    //   logout();
+    navigate('/');
+  };
+
+  const isActive = (path: string) => location.pathname === path;
+
+  return (
+    <nav className={`admin-navbar ${scrolled ? 'admin-navbar--scrolled' : ''}`}>
+      <div className="admin-navbar__container">
+
+        {/* Logo */}
+        <a href="/" className="admin-navbar__logo">
+          <div className="admin-navbar__logo-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="16" r="14" stroke="#7C3AED" strokeWidth="2.5" fill="none" />
+              <path
+                d="M9 16.5L13.5 21L23 11"
+                stroke="#7C3AED"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <span className="admin-navbar__logo-text">SIGMA</span>
+          <span className="admin-navbar__logo-badge">Admin</span>
+        </a>
+
+        {/* Nav Links */}
+        <ul className={`admin-navbar__links ${menuOpen ? 'admin-navbar__links--open' : ''}`}>
+          <li>
+            <button
+              className={`admin-navbar__link ${isActive('/Dashboard') ? 'admin-navbar__link--active' : ''}`}
+              onClick={() => { navigate('/Dashboard'); setMenuOpen(false); }}
+            >
+              Inicio
+            </button>
+          </li>
+          <li>
+            <button
+              className={`admin-navbar__link ${isActive('/Dashboard/ArbolAcademico') ? 'admin-navbar__link--active' : ''}`}
+              onClick={() => { navigate('/Dashboard/ArbolAcademico'); setMenuOpen(false); }}
+            >
+              Área Académica
+            </button>
+          </li>
+          <li>
+            <button
+              className={`admin-navbar__link ${isActive('/Dashboard/Noticias') ? 'admin-navbar__link--active' : ''}`}
+              onClick={() => { navigate('/Dashboard/Noticias'); setMenuOpen(false); }}
+            >
+              Noticias
+            </button>
+          </li>
+          <li>
+            <button className="admin-navbar__cta" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </li>
+        </ul>
+
+        {/* Mobile hamburger */}
+        <button
+          className={`admin-navbar__hamburger ${menuOpen ? 'admin-navbar__hamburger--open' : ''}`}
+          aria-label="Toggle menu"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+      </div>
+    </nav>
+  );
+}
