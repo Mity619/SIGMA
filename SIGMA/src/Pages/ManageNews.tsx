@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Components/Navbar";
+import AdminNavbar from "../Components/AdminNavbar";
 import { useNewsContext } from "../Context/NewsContext";
 import type { News, NewsCreateInput } from "../Utils/News";
 import "./SCSS/manage-news.scss";
@@ -166,7 +166,7 @@ export default function ManageNews() {
 
     return (
         <div className="manage-news">
-            <Navbar />
+            <AdminNavbar />
             <div className="manage-news__body">
                 <div className="manage-news__header">
                     <div>

@@ -2,7 +2,7 @@ import { useContext, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../Context/AuthContext";
 import { useNewsContext } from "../Context/NewsContext";
-import Navbar from "../Components/Navbar";
+import AdminNavbar from "../Components/AdminNavbar";
 import type { NewsCreateInput } from "../Utils/News";
 import "./SCSS/create-news.scss";
 
@@ -158,7 +158,7 @@ export default function CreateNews() {
 
     return (
         <div className="create-news">
-            <Navbar />
+            <AdminNavbar />
             <div className="create-news__body">
                 <div className="create-news__card">
                     <div className="create-news__header">
