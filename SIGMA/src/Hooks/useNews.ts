@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, setDoc, Timestamp } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase/config";
 import type { News, NewsAuthor, NewsCreateInput } from "../Utils/News";
 import { Stack } from "../Structures/Stack";
@@ -150,6 +150,22 @@ export const createNewsInFirestore = async (
 
     await setDoc(newsRef, newsItem);
     return newsItem;
+};
+
+export const deleteNewsFromFirestore = async (newsId: string): Promise<void> => {
+    await deleteDoc(doc(db, "news", newsId));
+};
+
+export const updateNewsInFirestore = async (
+    newsId: string,
+    updates: NewsCreateInput
+): Promise<void> => {
+    await updateDoc(doc(db, "news", newsId), {
+        title: updates.title.trim(),
+        category: updates.category.trim(),
+        description: updates.description.trim(),
+        imageUrl: updates.imageUrl.trim(),
+    });
 };
 
 export const getAutocompleteSuggestions = (trie: Trie, query: string): string[] =>

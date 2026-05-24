@@ -32,7 +32,7 @@ export default function NavBar() {
 
         {/* Nav Links */}
         <ul className="navbar__links">
-          <li><a href="/noticias" className="navbar__link">Noticias</a></li>
+          <li><a href="/News" className="navbar__link">Noticias</a></li>
           <li><a href="/about" className="navbar__link">¿Qué es SIGMA?</a></li>
           <li><a href="/SignIn" className="navbar__link">Inicia Sesión</a></li>
           <li>

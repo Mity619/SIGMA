@@ -1,9 +1,112 @@
-import { useContext, useState } from "react";
+import { useContext, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../Context/AuthContext";
 import { useNewsContext } from "../Context/NewsContext";
-import CreateNewsForm from "../Components/News/CreateNewsForm";
+import Navbar from "../Components/Navbar";
 import type { NewsCreateInput } from "../Utils/News";
+import "./SCSS/create-news.scss";
+
+interface CreateNewsFormProps {
+    onSubmit: (newsInput: NewsCreateInput) => Promise<boolean>;
+    submitting: boolean;
+}
+
+const initialFormState: NewsCreateInput = {
+    title: "",
+    category: "",
+    description: "",
+    imageUrl: "",
+};
+
+function CreateNewsForm({ onSubmit, submitting }: CreateNewsFormProps) {
+    const [formData, setFormData] = useState<NewsCreateInput>(initialFormState);
+
+    const updateField = <FieldName extends keyof NewsCreateInput>(
+        fieldName: FieldName,
+        value: NewsCreateInput[FieldName]
+    ): void => {
+        setFormData((currentFormData) => ({
+            ...currentFormData,
+            [fieldName]: value,
+        }));
+    };
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+        event.preventDefault();
+        const wasCreated = await onSubmit(formData);
+        if (wasCreated) {
+            setFormData(initialFormState);
+        }
+    };
+
+    return (
+        <form className="create-news__form" onSubmit={handleSubmit}>
+            <div className="create-news__field">
+                <label className="create-news__label">Título</label>
+                <input
+                    className="create-news__input"
+                    type="text"
+                    placeholder="Ej: Apertura de inscripciones 2025"
+                    value={formData.title}
+                    onChange={(e) => updateField("title", e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="create-news__field">
+                <label className="create-news__label">Categoría</label>
+                <input
+                    className="create-news__input"
+                    type="text"
+                    placeholder="Ej: Académico, Eventos..."
+                    value={formData.category}
+                    onChange={(e) => updateField("category", e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="create-news__field">
+                <label className="create-news__label">Descripción</label>
+                <textarea
+                    className="create-news__textarea"
+                    placeholder="Escribe el contenido de la noticia..."
+                    value={formData.description}
+                    onChange={(e) => updateField("description", e.target.value)}
+                    maxLength={200}
+                    required
+                />
+                <div className="create-news__field-footer">
+                    <span className={
+                        `create-news__counter${
+                            formData.description.length >= 200 ? " create-news__counter--limit" :
+                            formData.description.length >= 150 ? " create-news__counter--warn" : ""
+                        }`
+                    }>
+                        {formData.description.length}/200
+                    </span>
+                </div>
+            </div>
+
+            <div className="create-news__field">
+                <label className="create-news__label">
+                    URL de imagen
+                    <span className="create-news__label--optional">(opcional)</span>
+                </label>
+                <input
+                    className="create-news__input"
+                    type="text"
+                    placeholder="https://..."
+                    value={formData.imageUrl}
+                    onChange={(e) => updateField("imageUrl", e.target.value)}
+                />
+            </div>
+
+            <button className="create-news__submit" type="submit" disabled={submitting}>
+                {submitting ? "Guardando..." : "Publicar noticia"}
+            </button>
+        </form>
+    );
+}
 
 export default function CreateNews() {
     const navigate = useNavigate();
@@ -24,11 +127,6 @@ export default function CreateNews() {
             return false;
         }
 
-        if (user.type !== "Admin" && user.type !== "Profesor") {
-            navigate("/unauthorized");
-            return false;
-        }
-
         if (
             !newsInput.title.trim() ||
             !newsInput.category.trim() ||
@@ -46,7 +144,7 @@ export default function CreateNews() {
                 authorId: user.id,
                 authorName: user.name,
             });
-            navigate("/Dashboard");
+            navigate("/Dashboard/Noticias");
             return true;
         } catch (createError: unknown) {
             const message =
@@ -59,13 +157,27 @@ export default function CreateNews() {
     };
 
     return (
-        <main>
-            <button className="btn btn-danger btn-sm" onClick={authContext.logout}>
-                Cerrar sesión
-            </button>
-            <h1>Crear noticia</h1>
-            {error ? <p>{error}</p> : null}
-            <CreateNewsForm onSubmit={handleSubmit} submitting={submitting} />
-        </main>
+        <div className="create-news">
+            <Navbar />
+            <div className="create-news__body">
+                <div className="create-news__card">
+                    <div className="create-news__header">
+                        <button className="create-news__back" type="button" onClick={() => navigate("/Dashboard/Noticias")}>
+                            ← Volver 
+                        </button>
+                        <h1 className="create-news__title">Nueva noticia</h1>
+                        <p className="create-news__subtitle">Completa los campos para publicar una noticia.</p>
+                    </div>
+
+                    {error ? (
+                        <div className="create-news__error">
+                            <span>&#9888;</span> {error}
+                        </div>
+                    ) : null}
+
+                    <CreateNewsForm onSubmit={handleSubmit} submitting={submitting} />
+                </div>
+            </div>
+        </div>
     );
 }

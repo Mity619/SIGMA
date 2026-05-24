@@ -1,39 +1,30 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminRoute from "./Routes/AdminRoutes";
-import NewsCreateRoute from "./Routes/NewsCreateRoute";
+import Home from "./Pages/Home";
 import SignUp from "./Pages/SignUp";
 import SignIn from "./Pages/SignIn";
-import Dashboard from "./Pages/Dashboard";
+import NewsPage from "./Pages/News";
 import DashboardAdmin from "./Pages/DashboardAdmin";
 import ArbolAcademico from "./Pages/ArbolAcademico";
 import CreateNews from "./Pages/CreateNews";
-import Unauthorized from "./Pages/Unauthorized";
-import Home from "./Pages/Home"
+import ManageNews from "./Pages/ManageNews";
 
-
-function App() {  
-    return (  
+function App() {
+    return (
         <Routes>
-            <Route path="/" element={<Navigate to="/Dashboard" replace />} />
-            <Route path="/login" element={<Navigate to="/SignIn" replace />} />
-            <Route path="/Matriculas" element={<Navigate to="/Dashboard" replace />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/register" element={<SignUp/>} />
-            <Route path="/SignUp" element={<SignUp/>} />
-            <Route path="/SignIn" element={<SignIn/>} />
-            <Route path="/" element={<Home/>} />
-            <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/Home" element={<Home />} />
+            <Route path="/SignUp" element={<SignUp />} />
+            <Route path="/SignIn" element={<SignIn />} />
+            <Route path="/News" element={<NewsPage />} />
+            <Route path="/Matriculas" element={<Navigate to="/News" replace />} />
 
-            <Route element={<AdminRoute/>}>
+            <Route element={<AdminRoute />}>
                 <Route path="/DashboardAdmin" element={<DashboardAdmin />} />
                 <Route path="/Dashboard/ArbolAcademico" element={<ArbolAcademico />} />
+                <Route path="/Dashboard/Noticias" element={<ManageNews />} />
+                <Route path="/Dashboard/Noticias/crear" element={<CreateNews />} />
             </Route>
-
-            <Route element={<NewsCreateRoute />}>
-                <Route path="/news/create" element={<CreateNews />} />
-                <Route path="/Dashboard/Noticias" element={<CreateNews />} />
-            </Route>
-
         </Routes>
     );
 }

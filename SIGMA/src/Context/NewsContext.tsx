@@ -7,10 +7,12 @@ import {
     buildStackFromNews,
     buildTrieFromNews,
     createNewsInFirestore,
+    deleteNewsFromFirestore,
     fetchNewsFromFirestore,
     filterNewsByQuery,
     findNewsBySuggestion,
     getAutocompleteSuggestions,
+    updateNewsInFirestore,
 } from "../Hooks/useNews";
 
 interface NewsContextType {
@@ -29,6 +31,8 @@ interface NewsContextType {
     nextNews: () => void;
     previousNews: () => void;
     createNewsItem: (newsInput: NewsCreateInput, author: NewsAuthor) => Promise<void>;
+    deleteNewsItem: (newsId: string) => Promise<void>;
+    updateNewsItem: (newsId: string, updates: NewsCreateInput) => Promise<void>;
 }
 
 interface NewsContextProviderProps {
@@ -165,6 +169,29 @@ export const NewsContextProvider = ({ children }: NewsContextProviderProps) => {
         });
     };
 
+    const deleteNewsItem = async (newsId: string): Promise<void> => {
+        await deleteNewsFromFirestore(newsId);
+        setSelectedNews((current) => (current?.id === newsId ? null : current));
+        setNews((currentNews) => {
+            const updatedNews = currentNews.filter((item) => item.id !== newsId);
+            rebuildIndexes(updatedNews);
+            return updatedNews;
+        });
+    };
+
+    const updateNewsItem = async (newsId: string, updates: NewsCreateInput): Promise<void> => {
+        await updateNewsInFirestore(newsId, updates);
+        setNews((currentNews) => {
+            const updatedNews = currentNews.map((item) =>
+                item.id === newsId
+                    ? { ...item, title: updates.title.trim(), category: updates.category.trim(), description: updates.description.trim(), imageUrl: updates.imageUrl.trim() }
+                    : item
+            );
+            rebuildIndexes(updatedNews);
+            return updatedNews;
+        });
+    };
+
     const value: NewsContextType = {
         news,
         carouselNews,
@@ -181,6 +208,8 @@ export const NewsContextProvider = ({ children }: NewsContextProviderProps) => {
         nextNews,
         previousNews,
         createNewsItem,
+        deleteNewsItem,
+        updateNewsItem,
     };
 
     return <NewsContext.Provider value={value}>{children}</NewsContext.Provider>;

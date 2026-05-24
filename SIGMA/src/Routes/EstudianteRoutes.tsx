@@ -19,7 +19,7 @@ export default function EstudianteRoute() {
     // Verificar el tipo de usuario
     if (user.type !== "Estudiante") {
         // Redirección por defecto
-        return <Navigate to="/unauthorized" />;
+        return <Navigate to="/" />;
     }
     
     // Mostrar las rutas hijas
