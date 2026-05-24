@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import AuthContext from "../Context/AuthContext";
 import './SCSS/AdminNavbar.scss';
 
 export default function AdminNavbar() {
@@ -7,6 +8,7 @@ export default function AdminNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = useContext(AuthContext);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -15,15 +17,7 @@ export default function AdminNavbar() {
   }, []);
 
   const handleLogout = () => {
-    // TODO: Conectar aquí el logout real de Firebase o del AuthContext
-    // Ejemplo con Firebase:
-    //   import { signOut } from 'firebase/auth';
-    //   import { auth } from '../../firebase';
-    //   signOut(auth).then(() => navigate('/'));
-    //
-    // Ejemplo con AuthContext:
-    //   const { logout } = useAuth();
-    //   logout();
+    auth?.logout();
     navigate('/');
   };
 
@@ -56,7 +50,7 @@ export default function AdminNavbar() {
           <li>
             <button
               className={`admin-navbar__link ${isActive('/Dashboard') ? 'admin-navbar__link--active' : ''}`}
-              onClick={() => { navigate('/Dashboard'); setMenuOpen(false); }}
+              onClick={() => { navigate('/DashboardAdmin'); setMenuOpen(false); }}
             >
               Inicio
             </button>
