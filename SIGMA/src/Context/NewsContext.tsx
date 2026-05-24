@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { News, NewsAuthor, NewsCreateInput } from "../Utils/News";
-import { Stack } from "../Structures/Stack";
-import { Trie } from "../Structures/Trie";
+import { Stack } from "../utils/Stack";
+import { Trie } from "../utils/Trie";
 import {
     buildStackFromNews,
     buildTrieFromNews,

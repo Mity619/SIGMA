@@ -1,8 +1,8 @@
 import { collection, deleteDoc, doc, getDocs, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase/config";
 import type { News, NewsAuthor, NewsCreateInput } from "../Utils/News";
-import { Stack } from "../Structures/Stack";
-import { Trie } from "../Structures/Trie";
+import { Stack } from "../utils/Stack";
+import { Trie } from "../utils/Trie";
 
 const normalizeValue = (value: string): string =>
     value

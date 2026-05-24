@@ -29,4 +29,3 @@ export class Stack<T> {
         return [...this.items].reverse();
     }
 }
-

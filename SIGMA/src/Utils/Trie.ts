@@ -1,4 +1,4 @@
-export class TrieNode {
+﻿export class TrieNode {
     public readonly children: Map<string, TrieNode>;
     public isEnd: boolean;
     public readonly words: Set<string>;
@@ -89,4 +89,3 @@ export class Trie {
         return collectedWords;
     }
 }
-
