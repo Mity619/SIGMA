@@ -36,7 +36,7 @@ export default function ArbolAcademico() {
     const openPensumGraph = (node: any) => {
         if (node.type !== "Pensum") return;
 
-        navigate(`/admin/pensum/${node.id}`);
+        navigate(`/Dashboard/GrafoAcademico/${node.id}`);
     };
 
     const TreeNodeComponent = ({ node }: any) => {

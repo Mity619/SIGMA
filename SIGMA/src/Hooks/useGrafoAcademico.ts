@@ -11,16 +11,27 @@ import {
     query,
     where
 } from "firebase/firestore";
-import type { AcademicGraph, Materia, Grupo } from "../Utils/Graph";
+import type {
+    AcademicGraph,
+    Materia,
+    Grupo,
+    GrafoMateria
+} from "../Utils/Graph";
 
 export function useAcademicGraph() {
     const [graph, setGraph] = useState<AcademicGraph | null>(null);
+
+    // Materias generales de la carrera.
     const [materias, setMaterias] = useState<Materia[]>([]);
+
+    // Materias asignadas al grafo del pensum.
+    const [grafoMaterias, setGrafoMaterias] = useState<GrafoMateria[]>([]);
 
     const graphsRef = collection(db, "AcademicGraph");
     const materiasRef = collection(db, "Materias");
+    const grafoMateriasRef = collection(db, "GrafoMaterias");
 
-    //Obtener grafo usando el childrenId del pensum
+    // 🔹 Obtener un grafo por su id
     const getGraphById = async (graphId: string) => {
         const ref = doc(db, "AcademicGraph", graphId);
         const data = await getDoc(ref);
@@ -36,7 +47,7 @@ export function useAcademicGraph() {
         return graphData;
     };
 
-    //Buscar si un pensum ya tiene grafo asociado
+    // 🔹 Buscar si un pensum ya tiene grafo
     const getGraphByPensumId = async (pensumId: string) => {
         const q = query(graphsRef, where("pensumId", "==", pensumId));
         const data = await getDocs(q);
@@ -54,14 +65,19 @@ export function useAcademicGraph() {
         return graphData;
     };
 
-    //Crear un grafo nuevo para un pensum
-    const createGraphForPensum = async (pensumId: string, pensumName: string) => {
+    // 🔹 Crear grafo para un pensum
+    const createGraphForPensum = async (
+        pensumId: string,
+        pensumName: string,
+        carreraId: string
+    ) => {
         const graphDoc = await addDoc(graphsRef, {
             pensumId,
+            carreraId,
             nombre: `Grafo ${pensumName}`,
         });
 
-        //Guardar el id del grafo en el childrenId del nodo Pensum
+        // Guardamos el id del grafo en el childrenId del pensum.
         const pensumRef = doc(db, "AcademicNode", pensumId);
 
         await updateDoc(pensumRef, {
@@ -71,6 +87,7 @@ export function useAcademicGraph() {
         const newGraph: AcademicGraph = {
             id: graphDoc.id,
             pensumId,
+            carreraId,
             nombre: `Grafo ${pensumName}`,
         };
 
@@ -78,10 +95,11 @@ export function useAcademicGraph() {
         return newGraph;
     };
 
-    //Si el grafo existe, lo trae. Si no existe, lo crea.
+    // 🔹 Obtener o crear grafo
     const getOrCreateGraph = async (
         pensumId: string,
         pensumName: string,
+        carreraId: string,
         childrenId: string | null
     ) => {
         if (childrenId && childrenId !== "") {
@@ -104,12 +122,12 @@ export function useAcademicGraph() {
             return graphByPensum;
         }
 
-        return await createGraphForPensum(pensumId, pensumName);
+        return await createGraphForPensum(pensumId, pensumName, carreraId);
     };
 
-    //Obtener las materias que pertenecen a un grafo
-    const getMateriasByGraphId = async (graphId: string) => {
-        const q = query(materiasRef, where("graphId", "==", graphId));
+    // 🔹 Obtener materias generales de una carrera
+    const getMateriasByCarreraId = async (carreraId: string) => {
+        const q = query(materiasRef, where("carreraId", "==", carreraId));
         const data = await getDocs(q);
 
         const list: Materia[] = data.docs.map((doc) => ({
@@ -121,36 +139,32 @@ export function useAcademicGraph() {
         return list;
     };
 
-    //Crear materia como nodo del grafo
-    const addMateria = async (
-        graphId: string,
+    // 🔹 Crear materia general para una carrera
+    const addMateriaToCarrera = async (
+        carreraId: string,
         nombre: string,
         codigo: string,
         creditos: number,
-        semestre: number,
         grupos: Grupo[]
     ) => {
         await addDoc(materiasRef, {
-            graphId,
+            carreraId,
             nombre,
             codigo,
             creditos,
-            semestre,
             grupos,
-            prerequisitesId: [],
         });
 
-        await getMateriasByGraphId(graphId);
+        await getMateriasByCarreraId(carreraId);
     };
 
-    //Editar datos de una materia
-    const editMateria = async (
+    // 🔹 Editar materia general de una carrera
+    const editMateriaCarrera = async (
         materiaId: string,
-        graphId: string,
+        carreraId: string,
         nombre: string,
         codigo: string,
         creditos: number,
-        semestre: number,
         grupos: Grupo[]
     ) => {
         const ref = doc(db, "Materias", materiaId);
@@ -159,49 +173,138 @@ export function useAcademicGraph() {
             nombre,
             codigo,
             creditos,
-            semestre,
             grupos,
         });
 
-        await getMateriasByGraphId(graphId);
+        await getMateriasByCarreraId(carreraId);
     };
 
-    //Eliminar materia y quitarla como prerrequisito de otras materias
-    const deleteMateria = async (materiaId: string, graphId: string) => {
-        const currentMaterias = await getMateriasByGraphId(graphId);
+    // 🔹 Revisar si una materia está asignada a algún pensum
+    const materiaIsAssigned = async (materiaId: string) => {
+        const q = query(
+            grafoMateriasRef,
+            where("materiaId", "==", materiaId)
+        );
 
-        for (const materia of currentMaterias) {
-            if (materia.prerequisitesId.includes(materiaId)) {
-                const ref = doc(db, "Materias", materia.id);
+        const data = await getDocs(q);
+
+        return !data.empty;
+    };
+
+    // 🔹 Eliminar materia general de la carrera
+    const deleteMateriaCarrera = async (
+        materiaId: string,
+        carreraId: string
+    ) => {
+        const assigned = await materiaIsAssigned(materiaId);
+
+        if (assigned) {
+            alert("No puedes eliminar esta materia porque está asignada a uno o más pensums.");
+            return;
+        }
+
+        const ref = doc(db, "Materias", materiaId);
+
+        await deleteDoc(ref);
+
+        await getMateriasByCarreraId(carreraId);
+    };
+
+    // 🔹 Obtener materias asignadas a un grafo
+    const getGrafoMateriasByGraphId = async (graphId: string) => {
+        const q = query(grafoMateriasRef, where("graphId", "==", graphId));
+        const data = await getDocs(q);
+
+        const list: GrafoMateria[] = data.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<GrafoMateria, "id">),
+        }));
+
+        setGrafoMaterias(list);
+        return list;
+    };
+
+    // 🔹 Asignar una materia de la carrera al grafo del pensum
+    const addMateriaToGraph = async (
+        graphId: string,
+        materiaId: string,
+        semestre: number
+    ) => {
+        const currentGrafoMaterias = await getGrafoMateriasByGraphId(graphId);
+
+        const alreadyAdded = currentGrafoMaterias.some(
+            (gm) => gm.materiaId === materiaId
+        );
+
+        if (alreadyAdded) {
+            alert("Esta materia ya está asignada a este pensum.");
+            return;
+        }
+
+        await addDoc(grafoMateriasRef, {
+            graphId,
+            materiaId,
+            semestre,
+            prerequisitesId: [],
+        });
+
+        await getGrafoMateriasByGraphId(graphId);
+    };
+
+    // 🔹 Cambiar semestre de una materia dentro del grafo
+    const editGrafoMateria = async (
+        grafoMateriaId: string,
+        graphId: string,
+        semestre: number
+    ) => {
+        const ref = doc(db, "GrafoMaterias", grafoMateriaId);
+
+        await updateDoc(ref, {
+            semestre,
+        });
+
+        await getGrafoMateriasByGraphId(graphId);
+    };
+
+    // 🔹 Eliminar una materia del grafo y quitarla como prerrequisito de otras
+    const deleteGrafoMateria = async (
+        grafoMateriaId: string,
+        graphId: string
+    ) => {
+        const currentGrafoMaterias = await getGrafoMateriasByGraphId(graphId);
+
+        for (const gm of currentGrafoMaterias) {
+            if (gm.prerequisitesId.includes(grafoMateriaId)) {
+                const ref = doc(db, "GrafoMaterias", gm.id);
 
                 await updateDoc(ref, {
-                    prerequisitesId: materia.prerequisitesId.filter(
-                        (id) => id !== materiaId
+                    prerequisitesId: gm.prerequisitesId.filter(
+                        (id) => id !== grafoMateriaId
                     ),
                 });
             }
         }
 
-        const materiaRef = doc(db, "Materias", materiaId);
-        await deleteDoc(materiaRef);
+        const ref = doc(db, "GrafoMaterias", grafoMateriaId);
+        await deleteDoc(ref);
 
-        await getMateriasByGraphId(graphId);
+        await getGrafoMateriasByGraphId(graphId);
     };
 
-    //Revisar si una materia depende directa o indirectamente de otra
-    const materiaDependsOn = (
-        materiaId: string,
+    // 🔹 Verifica si una materia del grafo depende de otra
+    const grafoMateriaDependsOn = (
+        grafoMateriaId: string,
         targetId: string,
-        materiaList: Materia[]
+        list: GrafoMateria[]
     ): boolean => {
-        const materia = materiaList.find((m) => m.id === materiaId);
+        const grafoMateria = list.find((gm) => gm.id === grafoMateriaId);
 
-        if (!materia) return false;
+        if (!grafoMateria) return false;
 
-        for (const prerequisiteId of materia.prerequisitesId) {
+        for (const prerequisiteId of grafoMateria.prerequisitesId) {
             if (prerequisiteId === targetId) return true;
 
-            if (materiaDependsOn(prerequisiteId, targetId, materiaList)) {
+            if (grafoMateriaDependsOn(prerequisiteId, targetId, list)) {
                 return true;
             }
         }
@@ -209,94 +312,104 @@ export function useAcademicGraph() {
         return false;
     };
 
-    //Agregar prerrequisito evitando repetidos, autorrelaciones y ciclos
+    // 🔹 Agregar prerrequisito evitando ciclos
     const addPrerequisite = async (
-        materiaId: string,
-        prerequisiteId: string,
+        grafoMateriaId: string,
+        prerequisiteGrafoMateriaId: string,
         graphId: string
     ) => {
-        if (materiaId === prerequisiteId) {
+        if (grafoMateriaId === prerequisiteGrafoMateriaId) {
             alert("Una materia no puede ser prerrequisito de sí misma.");
             return;
         }
 
-        const currentMaterias = await getMateriasByGraphId(graphId);
+        const currentGrafoMaterias = await getGrafoMateriasByGraphId(graphId);
 
-        const materia = currentMaterias.find((m) => m.id === materiaId);
-        const prerequisite = currentMaterias.find((m) => m.id === prerequisiteId);
+        const grafoMateria = currentGrafoMaterias.find(
+            (gm) => gm.id === grafoMateriaId
+        );
 
-        if (!materia || !prerequisite) return;
+        const prerequisite = currentGrafoMaterias.find(
+            (gm) => gm.id === prerequisiteGrafoMateriaId
+        );
 
-        if (materia.prerequisitesId.includes(prerequisiteId)) {
+        if (!grafoMateria || !prerequisite) return;
+
+        if (grafoMateria.prerequisitesId.includes(prerequisiteGrafoMateriaId)) {
             alert("Ese prerrequisito ya fue agregado.");
             return;
         }
 
-        //Si el prerrequisito ya depende de la materia actual, se formaría un ciclo.
-        if (materiaDependsOn(prerequisiteId, materiaId, currentMaterias)) {
-            alert("El prerrequisito ya depende de la materia actual");
+        // Si el prerrequisito ya depende de la materia actual, se crea un ciclo.
+        if (
+            grafoMateriaDependsOn(
+                prerequisiteGrafoMateriaId,
+                grafoMateriaId,
+                currentGrafoMaterias
+            )
+        ) {
+            alert("No se puede agregar porque se formaría un ciclo en el grafo.");
             return;
         }
 
-        const ref = doc(db, "Materias", materiaId);
+        const ref = doc(db, "GrafoMaterias", grafoMateriaId);
 
         await updateDoc(ref, {
-            prerequisitesId: [...materia.prerequisitesId, prerequisiteId],
+            prerequisitesId: [
+                ...grafoMateria.prerequisitesId,
+                prerequisiteGrafoMateriaId,
+            ],
         });
 
-        await getMateriasByGraphId(graphId);
+        await getGrafoMateriasByGraphId(graphId);
     };
 
-    //Quitar un prerrequisito de una materia
+    // 🔹 Quitar prerrequisito
     const removePrerequisite = async (
-        materiaId: string,
-        prerequisiteId: string,
+        grafoMateriaId: string,
+        prerequisiteGrafoMateriaId: string,
         graphId: string
     ) => {
-        const materia = materias.find((m) => m.id === materiaId);
+        const grafoMateria = grafoMaterias.find(
+            (gm) => gm.id === grafoMateriaId
+        );
 
-        if (!materia) return;
+        if (!grafoMateria) return;
 
-        const ref = doc(db, "Materias", materiaId);
+        const ref = doc(db, "GrafoMaterias", grafoMateriaId);
 
         await updateDoc(ref, {
-            prerequisitesId: materia.prerequisitesId.filter(
-                (id) => id !== prerequisiteId
+            prerequisitesId: grafoMateria.prerequisitesId.filter(
+                (id) => id !== prerequisiteGrafoMateriaId
             ),
         });
 
-        await getMateriasByGraphId(graphId);
+        await getGrafoMateriasByGraphId(graphId);
     };
 
-    //Validar si un estudiante puede matricular una materia según su historial
-    const canEnrollMateria = (materia: Materia, history: string[]) => {
-        return materia.prerequisitesId.every((id) => history.includes(id));
-    };
-
-    //Obtener materias disponibles para un estudiante
-    const getAvailableMaterias = (history: string[]) => {
-        return materias.filter((materia) => {
-            const alreadyApproved = history.includes(materia.id);
-
-            if (alreadyApproved) return false;
-
-            return canEnrollMateria(materia, history);
-        });
+    // 🔹 Busca los datos de una materia usando su materiaId
+    const getMateriaInfo = (materiaId: string) => {
+        return materias.find((m) => m.id === materiaId);
     };
 
     return {
         graph,
         materias,
+        grafoMaterias,
         getGraphById,
         getGraphByPensumId,
         getOrCreateGraph,
-        getMateriasByGraphId,
-        addMateria,
-        editMateria,
-        deleteMateria,
+        getMateriasByCarreraId,
+        addMateriaToCarrera,
+        editMateriaCarrera,
+        deleteMateriaCarrera,
+        materiaIsAssigned,
+        getGrafoMateriasByGraphId,
+        addMateriaToGraph,
+        editGrafoMateria,
+        deleteGrafoMateria,
         addPrerequisite,
         removePrerequisite,
-        canEnrollMateria,
-        getAvailableMaterias,
+        getMateriaInfo,
     };
 }
