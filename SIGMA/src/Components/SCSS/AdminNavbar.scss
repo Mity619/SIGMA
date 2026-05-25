@@ -1,0 +1,206 @@
+$purple:      #7C3AED;
+$purple-dark: #5B21B6;
+$text-dark:   #111827;
+$text-mid:    #374151;
+$border:      #E5E7EB;
+$white:       #ffffff;
+
+.admin-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: $white;
+  border-bottom: 1px solid $border;
+  transition: box-shadow 0.25s ease;
+
+  &--scrolled {
+    box-shadow: 0 2px 16px rgba(124, 58, 237, 0.08);
+  }
+
+  &__container {
+    width: 100%;
+    padding: 0 2.5rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  // ── Logo ────────────────────────────────────
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    flex-shrink: 0;
+
+    &-icon { display: flex; align-items: center; }
+
+    &-text {
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: $text-dark;
+    }
+  }
+
+  // Badge "Admin" junto al logo — única diferencia visual con el navbar público
+  &__logo-badge {
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $purple;
+    border: 1.5px solid rgba($purple, 0.35);
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin-left: 2px;
+    align-self: center;
+  }
+
+  // ── Links ───────────────────────────────────
+  &__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  // Botones que actúan como links de texto (idénticos a navbar__link)
+  &__link {
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: $text-mid;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: $purple;
+      border-radius: 2px;
+      transition: width 0.25s ease;
+    }
+
+    &:hover {
+      color: $purple;
+      &::after { width: 100%; }
+    }
+
+    // Ruta activa: subrayado siempre visible
+    &--active {
+      color: $purple;
+      &::after { width: 100%; }
+    }
+  }
+
+  // ── CTA "Cerrar sesión" — mismo estilo que navbar__cta ──
+  &__cta {
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $white;
+    background: $purple;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 1.4rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      background: $purple-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+    }
+    &:active { transform: translateY(0); }
+  }
+
+  // ── Hamburger (mobile) ───────────────────────
+  &__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+
+    span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: $text-dark;
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    &--open {
+      span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    }
+  }
+
+  // ── Responsive ──────────────────────────────
+  @media (max-width: 768px) {
+    &__hamburger { display: flex; }
+
+    &__links {
+      display: none;
+      position: absolute;
+      top: 68px;
+      left: 0;
+      right: 0;
+      background: $white;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 1rem 2.5rem 1.5rem;
+      border-bottom: 1px solid $border;
+      box-shadow: 0 8px 24px rgba($purple, 0.08);
+      gap: 0;
+
+      &--open {
+        display: flex;
+        animation: slideDown 0.22s ease;
+      }
+
+      li { width: 100%; }
+    }
+
+    &__link {
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid $border;
+
+      &::after { bottom: 0; }
+    }
+
+    &__cta {
+      margin-top: 1rem;
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
