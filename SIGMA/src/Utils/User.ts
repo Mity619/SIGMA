@@ -1,4 +1,4 @@
-export type UserRole = 'Estudiante' | 'Admin' | 'Profesor';
+export type UserRole = 'Estudiante' | 'Admin';
 export type EnrollmentStatus = 'Matriculado' | 'NoMatriculado' | 'NoAplica';
 
 export interface User {
@@ -7,4 +7,5 @@ export interface User {
     enroll: EnrollmentStatus;
     name: string;
     history: string[];
+    pensum: string | null;
 }

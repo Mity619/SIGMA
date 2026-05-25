@@ -22,6 +22,9 @@ export default function SignIn() {
                 if (result.user.type === 'Admin') {
                     enqueueSnackbar('Inicio Sesión Exitoso',{variant:'success'});
                     navigate("/DashboardAdmin");
+                } else if (result.user.type === 'Estudiante') {
+                    enqueueSnackbar('Inicio Sesión Exitoso',{variant:'success'});
+                    navigate("/DashboardStudent");
                 }
             } else {
                 enqueueSnackbar('Error al Iniciar Sesión',{variant:'error'});
