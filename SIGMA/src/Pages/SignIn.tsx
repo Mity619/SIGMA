@@ -4,6 +4,7 @@ import AuthContext from "../Context/AuthContext";
 import { useFirebaseAuth } from '../Hooks/useFirebaseAuth';
 import Navbar from "../Components/Navbar";
 import "./SCSS/log.scss";
+import { useSnackbar } from 'notistack';
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function SignIn() {
     const [password, setPassword] = useState("");
     const { login: firebaseLogin } = useFirebaseAuth();
     const { login: contextLogin } = useContext(AuthContext)!;
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleLogin = async () => {
         try {
@@ -18,10 +20,11 @@ export default function SignIn() {
             if (result.success && result.user) {
                 contextLogin(result.user);
                 if (result.user.type === 'Admin') {
+                    enqueueSnackbar('Inicio Sesión Exitoso',{variant:'success'});
                     navigate("/DashboardAdmin");
                 }
             } else {
-                alert(result.error || "Error al iniciar sesión");
+                enqueueSnackbar('Error al Iniciar Sesión',{variant:'error'});
             }
         } catch (error: unknown) {
             if (error instanceof Error) alert(error.message);

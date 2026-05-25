@@ -1,0 +1,374 @@
+// ── Variables (misma paleta que Home/Navbar/log) ────────────
+$purple:       #7C3AED;
+$purple-dark:  #5B21B6;
+$purple-light: #EDE9FE;
+$purple-faint: #F5F3FF;
+$text-dark:    #111827;
+$text-mid:     #4B5563;
+$text-light:   #9CA3AF;
+$border:       #E5E7EB;
+$white:        #ffffff;
+
+// ── Animations ──────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blobDrift {
+  0%, 100% { border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%; }
+  50%       { border-radius: 45% 55% 40% 60% / 60% 40% 55% 45%; }
+}
+
+// ── Page wrapper ────────────────────────────────────────────
+.about-page {
+  min-height: 100vh;
+  background: $white;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  color: $text-dark;
+}
+
+.about-container {
+  width: 100%;
+}
+
+// ── Hero banner ─────────────────────────────────────────────
+.about-hero {
+  position: relative;
+  width: 100%;
+  background: $purple-faint;
+  border-bottom: 1px solid $purple-light;
+  padding: 5rem 4rem 4.5rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+
+  // Blob decorativo derecha
+  &__blob {
+    position: absolute;
+    right: -120px;
+    top: -80px;
+    width: 420px;
+    height: 420px;
+    background: $purple;
+    opacity: 0.12;
+    animation: blobDrift 10s ease-in-out infinite;
+    pointer-events: none;
+
+    // Segundo blob más pequeño
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -60px;
+      left: -80px;
+      width: 240px;
+      height: 240px;
+      background: $purple;
+      opacity: 0.5;
+      border-radius: 50%;
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    animation: fadeUp 0.65s ease both;
+  }
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $purple;
+    background: $purple-light;
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    margin-bottom: 1.2rem;
+  }
+
+  &__title {
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: $text-dark;
+    margin: 0 0 1.1rem;
+  }
+
+  &__desc {
+    font-size: 1.05rem;
+    color: $text-mid;
+    line-height: 1.65;
+    max-width: 560px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 3.5rem 1.5rem 3rem;
+    &__blob { right: -180px; top: -60px; width: 300px; height: 300px; }
+  }
+}
+
+// ── Body / secciones ────────────────────────────────────────
+.about-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+
+  @media (max-width: 768px) {
+    padding: 2.5rem 1.25rem 4rem;
+    gap: 2.5rem;
+  }
+}
+
+// ── Sección genérica ────────────────────────────────────────
+.about-section {
+  animation: fadeUp 0.6s ease both;
+
+  p {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: $text-mid;
+    margin-bottom: 1rem;
+
+    &:last-child { margin-bottom: 0; }
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid $purple-light;
+    position: relative;
+
+    // Acento izquierdo púrpura
+    &::before {
+      content: '';
+      position: absolute;
+      left: -1.25rem;
+      top: 0.1em;
+      bottom: 0.1em;
+      width: 4px;
+      background: $purple;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+      &::before { display: none; }
+    }
+  }
+
+  &__subtitle {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $purple-dark;
+    margin: 1.5rem 0 0.6rem;
+  }
+}
+
+// ── Lista estilizada ────────────────────────────────────────
+.about-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+
+  li {
+    font-size: 0.95rem;
+    color: $text-mid;
+    padding-left: 1.4rem;
+    position: relative;
+    line-height: 1.6;
+
+    // Bullet personalizado púrpura
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 7px;
+      height: 7px;
+      background: $purple;
+      border-radius: 50%;
+    }
+
+    strong { color: $text-dark; font-weight: 700; }
+  }
+}
+
+// ── Badge row (Facultad → Carrera → Pensum) ─────────────────
+.about-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.about-badge {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: $purple;
+  background: $purple-light;
+  padding: 0.35rem 1rem;
+  border-radius: 99px;
+  letter-spacing: 0.03em;
+}
+
+.about-badge-arrow {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $purple;
+  opacity: 0.6;
+}
+
+// ── Tech grid ───────────────────────────────────────────────
+.about-tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.about-tech-card {
+  background: $purple-faint;
+  border: 1.5px solid $purple-light;
+  border-radius: 14px;
+  padding: 1.2rem 1.3rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.14);
+    border-color: $purple;
+  }
+
+  &__name {
+    display: block;
+    font-size: 1rem;
+    font-weight: 800;
+    color: $purple;
+    margin-bottom: 0.4rem;
+  }
+
+  &__desc {
+    font-size: 0.88rem;
+    color: $text-mid;
+    line-height: 1.55;
+    margin: 0;
+  }
+}
+
+// ── Team section ────────────────────────────────────────────
+.about-section--team {
+  // Separador visual superior
+  padding-top: 1rem;
+  border-top: 2px dashed $purple-light;
+}
+
+.about-team__intro {
+  font-size: 0.97rem;
+  color: $text-mid;
+  margin-bottom: 2rem !important;
+}
+
+.about-team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+.about-team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 18px;
+  padding: 2rem 1.5rem 1.75rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 36px rgba(124, 58, 237, 0.16);
+    border-color: $purple;
+  }
+
+  // Contenedor del avatar (foto + fallback initials superpuestos)
+  &__avatar {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin-bottom: 1.1rem;
+    background: $purple;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.30);
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 50%;
+      z-index: 1;
+    }
+  }
+
+  // Iniciales visibles cuando la foto no carga
+  &__initials {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: $white;
+    letter-spacing: 0.04em;
+    z-index: 0;
+  }
+
+  &__name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 0.3rem;
+  }
+
+  &__career {
+    font-size: 0.83rem;
+    color: $text-mid;
+    margin: 0 0 0.7rem;
+    line-height: 1.0;
+  }
+
+  &__code {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $purple;
+    background: $purple-light;
+    padding: 0.25rem 0.85rem;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+  }
+}

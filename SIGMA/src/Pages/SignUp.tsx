@@ -4,6 +4,7 @@ import { useFirebaseAuth } from '../Hooks/useFirebaseAuth';
 import type { UserRole, EnrollmentStatus } from '../Utils/User';
 import Navbar from "../Components/Navbar";
 import "./SCSS/log.scss";
+import { useSnackbar } from 'notistack';
 
 export default function SignUp() {
     const navigate = useNavigate();
@@ -12,15 +13,16 @@ export default function SignUp() {
     const [password, setPassword] = useState("");
     const [type, setType] = useState<UserRole>('Estudiante');
     const { register } = useFirebaseAuth();
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleSignUp = async () => {
         try {
             if (!name.trim() || !email.trim() || !password.trim()) {
-                alert("Todos los campos son obligatorios");
+                enqueueSnackbar('Por favor, completa todos los campos.', {variant:'error'});
                 return;
             }
             if (password.length < 6) {
-                alert("La contraseña debe tener al menos 6 caracteres");
+                enqueueSnackbar('La contraseña debe tener al menos 6 caracteres.', {variant:'error'});
                 return;
             }
 
@@ -30,13 +32,17 @@ export default function SignUp() {
             const result = await register(email, password, type, name, finalEnroll);
 
             if (result.success) {
-                alert("Registro exitoso. Ahora inicia sesión.");
+                enqueueSnackbar('Registro exitoso. Ahora puedes iniciar sesión.', {variant:'success'});
                 navigate("/SignIn");
             } else {
-                alert(result.error || "Error al registrarse");
+                enqueueSnackbar('No se pudo completar el registro.', {variant:'error'});
             }
         } catch (error: unknown) {
-            if (error instanceof Error) alert(error.message);
+            if (error instanceof Error) {
+                enqueueSnackbar(error.message, {
+                    variant: 'error'
+                });
+            }
         }
     };
 

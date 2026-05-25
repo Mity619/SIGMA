@@ -18,8 +18,7 @@ export default function AdminRoute() {
     
     // Verificar el tipo de usuario
     if (user.type !== "Admin") {
-        // Redirección por defecto
-        return <Navigate to="/unauthorized" />;
+        return <Navigate to="/" />;
     }
     
     // Mostrar las rutas hijas
