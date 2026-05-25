@@ -542,3 +542,38 @@ $pensum-bg:       $green-light;
     transform: translateY(0);
   }
 }
+
+//Snackbar
+.arbol-academico {
+  &__snackbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.75rem;
+  }
+
+  &__snackbar-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    &--danger {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    &--secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+  }
+}
