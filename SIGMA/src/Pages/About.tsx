@@ -17,8 +17,8 @@ const team = [
     {
         name: "Alex Yohan Silva Mina",
         career: "Ingeniería Informática",
-        code: "",
-        photo: "/Alex.png",
+        code: "1105927503",
+        photo: "/Alex.jpeg",
     },
 ];
 
