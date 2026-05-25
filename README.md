@@ -17,7 +17,7 @@
 
 ---
 
-> Proyecto final de la asignatura **Estructuras de Datos II** — Ingeniería Informática  
+> Proyecto final de la asignatura **Estructuras de Datos y Algoritmos II** — Ingeniería Informática  
 > SIGMA aplica estructuras de datos reales (pilas, árboles y grafos) dentro de un sistema web funcional e institucional.
 
 </div>
@@ -381,8 +381,8 @@ El proyecto está configurado para desplegarse en servicios de hosting estático
 
 | Recurso | Enlace |
 |---|---|
-| 📁 Repositorio GitHub | [Enlace al repositorio] |
-| 🎨 Propuesta gráfica (Figma / Adobe) | [Enlace a la propuesta gráfica] |
+| 📁 Repositorio GitHub | https://github.com/Mity619/SIGMA.git |
+| 🎨 Propuesta gráfica (Figma / Adobe) | https://www.figma.com/design/GCeRQq6x9O9OJVGsIUiv3e/SIGMA?node-id=0-1&t=EiPdIAZslg2OtHDK-1 |
 | 🌐 Despliegue en producción | [Enlace al despliegue] |
 | 📄 Documento final del proyecto | [Enlace al documento final] |
 
@@ -416,7 +416,7 @@ El proyecto evidencia cómo una aplicación web moderna puede, al mismo tiempo, 
 
 **SIGMA** · Sistema Institucional de Gestión de Matrículas Académicas
 
-*Ingeniería Informática — Estructuras de Datos II*
+*Ingeniería Informática — Estructuras de Datos y Algoritmos II*
 
 ![Made with](https://img.shields.io/badge/Hecho%20con-React%20%2B%20TypeScript-7C3AED?style=flat-square)
 
