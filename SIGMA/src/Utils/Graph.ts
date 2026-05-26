@@ -1,6 +1,7 @@
 export interface Grupo {
     nombre: string;
     cupos: number;
+    matriculados: string[]; // IDs de los estudiantes matriculados
 }
 
 // Materia general de una carrera.

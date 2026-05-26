@@ -8,4 +8,8 @@ export interface User {
     name: string;
     history: string[];
     pensum: string | null;
+    matricula: {
+        materiaId: string;
+        grupoNombre: string;
+    }[];
 }

@@ -13,6 +13,7 @@ import CreateNews from "./Pages/CreateNews";
 import ManageNews from "./Pages/ManageNews";
 import About from "./Pages/About";
 import Historial from "./Pages/Historial";
+import Matricula from "./Pages/Matricula";
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function App() {
             <Route element={<EstudianteRoute/>}>
                 <Route  path="/DashboardStudent" element={<DashboardStudent/>} />
                 <Route path="/Dashboard/Historial" element={<Historial/>} />
+                <Route path="/Dashboard/Matriculas" element={<Matricula/>} />
             </Route>
         </Routes>
     );
