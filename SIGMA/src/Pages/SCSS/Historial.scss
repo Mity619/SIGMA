@@ -1,0 +1,711 @@
+// ── Variables (paleta global SIGMA) ─────────────────────────
+$purple:        #7C3AED;
+$purple-dark:   #5B21B6;
+$purple-light:  #EDE9FE;
+$purple-faint:  #F5F3FF;
+$text-dark:     #111827;
+$text-mid:      #4B5563;
+$text-light:    #9CA3AF;
+$border:        #E5E7EB;
+$white:         #ffffff;
+$amber:         #D97706;
+$amber-faint:   #FFFBEB;
+$amber-border:  #FDE68A;
+$green:         #059669;
+$green-faint:   #ECFDF5;
+
+// ── Animations ──────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+// ── Page ────────────────────────────────────────────────────
+.hist-page {
+  min-height: 100vh;
+  background: $white;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  color: $text-dark;
+}
+
+.hist-container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+  animation: fadeUp 0.55s ease both;
+
+  @media (max-width: 640px) { padding: 2rem 1.25rem 4rem; }
+}
+
+// ── Header ──────────────────────────────────────────────────
+.hist-header {
+  margin-bottom: 2.5rem;
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $purple;
+    background: $purple-light;
+    padding: 0.28rem 0.85rem;
+    border-radius: 99px;
+    margin-bottom: 0.85rem;
+  }
+
+  &__title {
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-weight: 900;
+    color: $text-dark;
+    line-height: 1.1;
+    margin: 0 0 0.8rem;
+  }
+
+  &__desc {
+    font-size: 0.96rem;
+    color: $text-mid;
+    line-height: 1.7;
+    max-width: 560px;
+
+    strong { color: $text-dark; }
+  }
+}
+
+// ── Stepper ─────────────────────────────────────────────────
+.hist-stepper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 0;
+}
+
+.hist-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+
+  &__circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid $border;
+    background: $white;
+    color: $text-light;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+  }
+
+  &__label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-light;
+    white-space: nowrap;
+    transition: color 0.25s ease;
+  }
+
+  &__line {
+    flex: 1;
+    height: 2px;
+    background: $border;
+    margin: 0 0.5rem;
+    transition: background 0.25s ease;
+  }
+
+  // Completado
+  &--done {
+    .hist-step__circle {
+      background: $purple;
+      border-color: $purple;
+      color: $white;
+    }
+    .hist-step__label { color: $purple; }
+    .hist-step__line  { background: $purple; }
+  }
+
+  // Activo
+  &--active {
+    .hist-step__circle {
+      border-color: $purple;
+      color: $purple;
+      box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+    }
+    .hist-step__label { color: $purple; font-weight: 800; }
+  }
+}
+
+// ── Breadcrumb de selección ──────────────────────────────────
+.hist-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  padding: 0.7rem 1rem;
+  background: $purple-faint;
+  border: 1px solid $purple-light;
+  border-radius: 10px;
+  animation: fadeUp 0.35s ease both;
+
+  &__item {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $purple-dark;
+
+    &--pensum { color: $purple; font-weight: 800; }
+  }
+
+  &__sep {
+    font-size: 0.8rem;
+    color: $text-light;
+  }
+}
+
+// ── Panel principal ──────────────────────────────────────────
+.hist-panel {
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 18px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  min-height: 220px;
+  animation: fadeUp 0.45s ease both;
+
+  @media (max-width: 480px) { padding: 1.25rem; }
+}
+
+// ── Loader ──────────────────────────────────────────────────
+.hist-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2.5rem 0;
+  color: $text-mid;
+  font-size: 0.9rem;
+
+  &__spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid $purple-light;
+    border-top-color: $purple;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+}
+
+// ── Opciones (grid de cards) ─────────────────────────────────
+.hist-options {
+  &__title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 1.25rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid $purple-light;
+  }
+}
+
+.hist-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.hist-option-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  transition: border-color 0.2s ease, background 0.2s ease,
+              transform 0.18s ease, box-shadow 0.2s ease;
+  animation: cardIn 0.35s ease both;
+
+  // Escalonar entrada de cada card
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.05}s; }
+  }
+
+  &:hover {
+    border-color: $purple;
+    background: $purple-faint;
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(124,58,237,0.12);
+
+    .hist-option-card__arrow { transform: translateX(4px); color: $purple; }
+  }
+
+  &__icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $text-dark;
+  }
+
+  &__arrow {
+    font-size: 1rem;
+    color: $text-light;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+}
+
+// ── Confirmar pénsum ─────────────────────────────────────────
+.hist-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: fadeUp 0.4s ease both;
+
+  // Warning banner
+  &__warning {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: $amber-faint;
+    border: 1.5px solid $amber-border;
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+
+    &-icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+
+    strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: $amber;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      font-size: 0.88rem;
+      color: darken($amber, 20%);
+      line-height: 1.6;
+      margin: 0;
+
+      strong { display: inline; font-size: inherit; }
+    }
+  }
+
+  // Resumen de selección
+  &__summary {
+    background: $purple-faint;
+    border: 1.5px solid $purple-light;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+
+    span  { color: $text-mid; }
+    strong { color: $text-dark; font-weight: 700; text-align: right; }
+  }
+
+  // Botón confirmar
+  &__btn {
+    width: 100%;
+    padding: 0.95rem;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.93rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: $white;
+    background: $purple;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      background: $purple-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+    }
+    &:active { transform: translateY(0); }
+  }
+}
+
+// ── Botón volver ─────────────────────────────────────────────
+.hist-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.1rem;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $text-mid;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  transition: color 0.2s ease, transform 0.15s ease;
+
+  &:hover {
+    color: $purple;
+    transform: translateX(-3px);
+  }
+}
+
+// ── Vista: pénsum asignado ────────────────────────────────────
+.hist-assigned {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0 2rem;
+
+  &__icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    line-height: 1;
+  }
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $green;
+    background: $green-faint;
+    padding: 0.28rem 0.9rem;
+    border-radius: 99px;
+    margin-bottom: 0.9rem;
+  }
+
+  &__title {
+    font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+    font-weight: 900;
+    color: $text-dark;
+    margin: 0 0 0.75rem;
+  }
+
+  &__pensum {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: $purple;
+    background: $purple-light;
+    padding: 0.45rem 1.4rem;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+  }
+
+  &__desc {
+    font-size: 0.96rem;
+    color: $text-mid;
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+}
+
+// ── Estado vacío del historial ───────────────────────────────
+.hist-empty {
+  width: 100%;
+  max-width: 420px;
+  border: 2px dashed $border;
+  border-radius: 16px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: $text-light;
+
+  &__icon { font-size: 2rem; }
+
+  p { font-size: 0.9rem; text-align: center; }
+}
+
+// ════════════════════════════════════════════════════════════
+// VISTA HISTORIAL — gestión de materias
+// ════════════════════════════════════════════════════════════
+
+// ── Tarjeta de progreso / pénsum activo ─────────────────────
+.hist-progress-card {
+  background: $purple-faint;
+  border: 1.5px solid $purple-light;
+  border-radius: 16px;
+  padding: 1.4rem 1.6rem 1.2rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  animation: fadeUp 0.45s ease both;
+
+  &__left {
+    flex: 1;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $text-light;
+  }
+
+  &__pensum {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: $purple;
+  }
+
+  &__stats {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+// Mini stat dentro de la tarjeta
+.hist-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 56px;
+
+  span {
+    font-size: 1.3rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+  small {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &--green  { span { color: #059669; } small { color: #6EE7B7; } }
+  &--gray   { span { color: $text-mid; } small { color: $text-light; } }
+  &--purple { span { color: $purple; } small { color: lighten($purple, 28%); } }
+}
+
+// Barra de progreso (ocupa el ancho completo de la card)
+.hist-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: $purple-light;
+  border-radius: 99px;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    background: $purple;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+}
+
+// ── Controles: búsqueda + filtros ───────────────────────────
+.hist-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  animation: fadeUp 0.5s 0.05s ease both;
+}
+
+.hist-search {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.65rem 1rem;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  color: $text-dark;
+  background: $purple-faint;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder { color: $text-light; }
+
+  &:focus {
+    border-color: $purple;
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    background: $white;
+  }
+}
+
+.hist-filter-tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.hist-filter-tab {
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $text-mid;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+
+  &:hover { border-color: $purple; color: $purple; }
+
+  &--active {
+    background: $purple;
+    color: $white;
+    border-color: $purple;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.28);
+  }
+}
+
+// ── Lista de materias ────────────────────────────────────────
+.hist-materias {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.hist-materia-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  transition: border-color 0.2s ease, background 0.2s ease,
+              box-shadow 0.2s ease, transform 0.15s ease;
+  animation: cardIn 0.3s ease both;
+
+  @for $i from 1 through 30 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.03}s; }
+  }
+
+  // Estado: materia cursada
+  &--vista {
+    background: #F0FDF4;
+    border-color: #6EE7B7;
+
+    .hist-materia-card__name { color: #065F46; }
+  }
+
+  &:hover {
+    transform: translateX(3px);
+    box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  &__name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  &__credits {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: $text-light;
+  }
+
+  &__badge {
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: #059669;
+    background: #D1FAE5;
+    padding: 0.15rem 0.6rem;
+    border-radius: 99px;
+  }
+
+  // Botones añadir / quitar
+  &__btn {
+    flex-shrink: 0;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.14s ease,
+                box-shadow 0.18s ease, opacity 0.18s ease;
+
+    &:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    &--añadir {
+      color: $white;
+      background: $purple;
+      &:hover:not(:disabled) {
+        background: $purple-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(124,58,237,0.32);
+      }
+    }
+
+    &--quitar {
+      color: #DC2626;
+      background: #FEF2F2;
+      border: 1.5px solid #FECACA;
+      &:hover:not(:disabled) {
+        background: #DC2626;
+        color: $white;
+        border-color: #DC2626;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

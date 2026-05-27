@@ -160,6 +160,7 @@ export default function GrafoAcademico() {
         const newGrupo: Grupo = {
             nombre: grupoNombre.trim(),
             cupos: grupoCupos,
+            matriculados: []
         };
 
         setGrupos([...grupos, newGrupo]);
@@ -319,7 +320,7 @@ export default function GrafoAcademico() {
         if (!nombreGrupo) return;
         const cuposGrupo = Number(prompt("Cupos del grupo:"));
         if (!cuposGrupo) return;
-        const newGrupo: Grupo = { nombre: nombreGrupo, cupos: cuposGrupo };
+        const newGrupo: Grupo = { nombre: nombreGrupo, cupos: cuposGrupo, matriculados: []};
         setEditGrupos([...editGrupos, newGrupo]);
     };
 
