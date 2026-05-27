@@ -23,7 +23,8 @@ export const useFirebaseAuth = () => {
                 const data = docSnap.data();
                 // Aseguramos que tenga la estructura exacta de User
                 const userData: User = {
-                    id: docSnap.id,          // el UID
+                    id: docSnap.id,
+                    matricula: [],          // el UID
                     type: data.type,
                     enroll: data.enroll,
                     name: data.name,
@@ -83,6 +84,7 @@ export const useFirebaseAuth = () => {
 
             // 2. Crear documento en Firestore con la estructura exacta de User
             const newUser: Omit<User, 'id'> = {
+                matricula: [],
                 type,
                 enroll,
                 name,

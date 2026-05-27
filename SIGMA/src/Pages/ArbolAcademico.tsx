@@ -153,7 +153,6 @@ export default function ArbolAcademico() {
 
   if (!auth) return null;
 
-  const { logout } = auth;
   const { nodes, addNode, deleteNode, editNode, refresh } = useArchivo();
 
   // Construcción recursiva del árbol

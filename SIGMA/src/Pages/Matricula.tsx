@@ -30,13 +30,11 @@ export default function Matricula() {
     useEffect(() => {
         
         const cargarDatosFaltantes = async () => {
-            let cambios = false;
             // Si el usuario tiene pensum pero no tiene matricula o está vacío, cargar
             if (user.pensum && (!user.matricula || user.matricula.length === 0)) {
                 const matriculaFire = await cargarMatriculaUsuario(user.id);
                 if (matriculaFire.length > 0) {
                     updateUser({ matricula: matriculaFire });
-                    cambios = true;
                 }
             }
             // Si el usuario tiene pensum pero no tiene history o está vacío, cargar
@@ -44,7 +42,6 @@ export default function Matricula() {
                 const historyFire = await cargarHistorialUsuario(user.id);
                 if (historyFire.length > 0) {
                     updateUser({ history: historyFire });
-                    cambios = true;
                 }
             }
             // Si hubo cambios, forzar re-render (updateUser ya lo hace)
