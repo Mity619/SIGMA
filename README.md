@@ -384,7 +384,6 @@ El proyecto está configurado para desplegarse en servicios de hosting estático
 | 📁 Repositorio GitHub | https://github.com/Mity619/SIGMA.git |
 | 🎨 Propuesta gráfica (Figma / Adobe) | https://www.figma.com/design/GCeRQq6x9O9OJVGsIUiv3e/SIGMA?node-id=0-1&t=EiPdIAZslg2OtHDK-1 |
 | 🌐 Despliegue en producción | [Enlace al despliegue] |
-| 📄 Documento final del proyecto | [Enlace al documento final] |
 
 ---
 
