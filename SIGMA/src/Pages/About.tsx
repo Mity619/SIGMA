@@ -1,5 +1,5 @@
 import Navbar from '../Components/Navbar';
-import './SCSS/about.scss';
+import './SCSS/About.scss';
 
 const team = [
     {
