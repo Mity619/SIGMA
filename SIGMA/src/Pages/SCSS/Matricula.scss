@@ -1,0 +1,467 @@
+// ── Variables (paleta global SIGMA) ─────────────────────────
+$purple:       #7C3AED;
+$purple-dark:  #5B21B6;
+$purple-light: #EDE9FE;
+$purple-faint: #F5F3FF;
+$text-dark:    #111827;
+$text-mid:     #4B5563;
+$text-light:   #9CA3AF;
+$border:       #E5E7EB;
+$white:        #ffffff;
+$green:        #059669;
+$green-light:  #D1FAE5;
+$green-faint:  #F0FDF4;
+$red:          #DC2626;
+$red-light:    #FECACA;
+$red-faint:    #FEF2F2;
+$amber:        #D97706;
+$amber-light:  #FDE68A;
+$amber-faint:  #FFFBEB;
+
+// ── Animations ──────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+// ── Page ────────────────────────────────────────────────────
+.mat-page {
+  min-height: 100vh;
+  background: $white;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  color: $text-dark;
+}
+
+.mat-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3.5rem 2.5rem 5rem;
+  animation: fadeUp 0.5s ease both;
+
+  @media (max-width: 640px) { padding: 2rem 1.25rem 4rem; }
+}
+
+// ── Header ──────────────────────────────────────────────────
+.mat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2.25rem;
+
+  @media (max-width: 640px) { flex-direction: column; gap: 1.25rem; }
+
+  &__left  { flex: 1; }
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $purple;
+    background: $purple-light;
+    padding: 0.28rem 0.85rem;
+    border-radius: 99px;
+    margin-bottom: 0.85rem;
+  }
+
+  &__title {
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 0.75rem;
+  }
+
+  &__desc {
+    font-size: 0.96rem;
+    color: $text-mid;
+    line-height: 1.7;
+    strong { color: $text-dark; }
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex-shrink: 0;
+  }
+}
+
+// ── Stats mini ───────────────────────────────────────────────
+.mat-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 56px;
+  background: $purple-faint;
+  border: 1.5px solid $purple-light;
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
+
+  span  { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+  small { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: $text-light; }
+
+  &--purple span { color: $purple; }
+  &--green  span { color: $green;  }
+}
+
+// Badge "en vivo" pulsante
+.mat-realtime-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $green;
+  background: $green-faint;
+  border: 1.5px solid $green-light;
+  padding: 0.35rem 0.85rem;
+  border-radius: 99px;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    background: $green;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+// ── Controles ────────────────────────────────────────────────
+.mat-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mat-search {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.65rem 1rem;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  color: $text-dark;
+  background: $purple-faint;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+
+  &::placeholder { color: $text-light; }
+  &:focus { border-color: $purple; box-shadow: 0 0 0 3px rgba(124,58,237,0.12); background: $white; }
+}
+
+.mat-filter-tabs { display: flex; gap: 0.4rem; }
+
+.mat-filter-tab {
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $text-mid;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+
+  &:hover { border-color: $purple; color: $purple; }
+  &--active { background: $purple; color: $white; border-color: $purple; box-shadow: 0 4px 12px rgba(124,58,237,0.28); }
+}
+
+.mat-semestre-select {
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-dark;
+  background: $purple-faint;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  padding: 0.45rem 2rem 0.45rem 0.85rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237C3AED' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  transition: border-color 0.2s;
+
+  &:focus { border-color: $purple; }
+}
+
+// ── Loader ───────────────────────────────────────────────────
+.mat-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: $text-mid;
+  font-size: 0.9rem;
+
+  &__spinner {
+    width: 38px;
+    height: 38px;
+    border: 3px solid $purple-light;
+    border-top-color: $purple;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+}
+
+// ── Empty state ──────────────────────────────────────────────
+.mat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: $text-mid;
+
+  &__icon { font-size: 2.5rem; }
+  h2 { font-size: 1.2rem; font-weight: 800; color: $text-dark; margin: 0; }
+  p  { font-size: 0.9rem; max-width: 360px; }
+}
+
+// ── Lista de materias ────────────────────────────────────────
+.mat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+// ── Card de materia ──────────────────────────────────────────
+.mat-card {
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease;
+  animation: cardIn 0.35s ease both;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.04}s; }
+  }
+
+  &:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.07); }
+
+  &--matriculada {
+    border-color: #6EE7B7;
+    background: $green-faint;
+  }
+  &--bloqueada {
+    border-color: $border;
+    opacity: 0.8;
+  }
+
+  // Cabecera clickeable
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.18s ease;
+
+    &:hover { background: $purple-faint; }
+  }
+
+  &__info { flex: 1; min-width: 0; }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+
+  &__nombre {
+    font-size: 1rem;
+    font-weight: 800;
+    color: $text-dark;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: $text-light;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  &__reqs {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  &__reqs-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__chevron {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: $text-light;
+    transition: transform 0.25s ease, color 0.2s;
+    line-height: 1;
+    flex-shrink: 0;
+    rotate: 0deg;
+
+    &--open {
+      transform: rotate(90deg);
+      color: $purple;
+    }
+  }
+}
+
+// ── Badges ───────────────────────────────────────────────────
+.mat-badge {
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 0.18rem 0.6rem;
+  border-radius: 99px;
+  white-space: nowrap;
+
+  &--green { color: $green; background: $green-light; }
+  &--red   { color: $red;   background: $red-light;   }
+}
+
+// ── Chips de requisito ────────────────────────────────────────
+.mat-req-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.18rem 0.6rem;
+  border-radius: 99px;
+
+  &--ok   { color: $green; background: $green-light; }
+  &--fail { color: $red;   background: $red-light;   }
+}
+
+// ── Grupos (panel desplegable) ───────────────────────────────
+.mat-grupos {
+  border-top: 1.5px solid $border;
+  padding: 0.85rem 1.4rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  animation: slideDown 0.25s ease both;
+  background: #FAFAFA;
+}
+
+.mat-grupo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  transition: border-color 0.2s, background 0.2s;
+
+  &--lleno      { background: $red-faint;   border-color: $red-light; }
+  &--matriculado{ background: $green-faint; border-color: #6EE7B7;   }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  &__nombre {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+
+  &__cupos {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__num {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-mid;
+
+    &--lleno { color: $red; }
+  }
+
+  // Barra de ocupación
+  &__bar {
+    width: 100%;
+    height: 5px;
+    background: $border;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  &__bar-fill {
+    height: 100%;
+    background: $purple;
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+
+    &--warn { background: $amber; }
+    &--full { background: $red;   }
+  }
+
+  // Botón de grupo
+  &__btn {
+    flex-shrink: 0;
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 700;
+    padding: 0.5rem 1.1rem;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.18s, transform 0.14s, box-shadow 0.18s, opacity 0.18s;
+    background: $purple;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: $purple-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(124,58,237,0.32);
+    }
+    &:disabled { cursor: not-allowed; opacity: 0.6; transform: none; box-shadow: none; }
+
+    &--inscrito  { background: $green;         &:disabled { opacity: 1; } }
+    &--lleno     { background: $red-faint;   color: $red;        border: 1.5px solid $red-light; }
+    &--bloqueado { background: $border;      color: $text-light; }
+  }
+}
