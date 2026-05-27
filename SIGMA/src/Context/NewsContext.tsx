@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { News, NewsAuthor, NewsCreateInput } from "../Utils/News";
-import { Stack } from "../utils/Stack";
-import { Trie } from "../utils/Trie";
+import { Stack } from "../Utils/Stack";
+import { Trie } from "../Utils/Trie";
 import {
     buildStackFromNews,
     buildTrieFromNews,
@@ -139,7 +139,7 @@ export const NewsContextProvider = ({ children }: NewsContextProviderProps) => {
         }
 
         const currentIndex = selectedNews
-            ? carouselNews.findIndex((newsItem) => isSameNews(newsItem, selectedNews))
+            ? carouselNews.findIndex((newsItem: News) => isSameNews(newsItem, selectedNews))
             : 0;
         const normalizedIndex = currentIndex >= 0 ? currentIndex : 0;
         const nextIndex =
