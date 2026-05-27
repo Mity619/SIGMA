@@ -54,16 +54,31 @@ export function useMatricula() {
                 return;
             }
 
-            // Mapa materiaId → metadata del grafo
+            // prerequisitesId en GrafoMaterias contiene doc.id de NODOS
+            // del grafo, no materiaId. Hay que resolverlos primero.
+            // Paso 1: construir mapa  nodoDocId -> materiaId
+            const docIdToMateriaId: Record<string, string> = {};
+            grafoSnap.docs.forEach(nodo => {
+                docIdToMateriaId[nodo.id] = nodo.data().materiaId as string;
+            });
+
+            // Paso 2: construir metaMap con prerequisites ya resueltos
             const metaMap: Record<string, { semestre: number; prerequisites: string[] }> = {};
             const materiaIds: string[] = [];
 
             grafoSnap.docs.forEach(nodo => {
-                const d = nodo.data();
+                const d   = nodo.data();
                 const mid = d.materiaId as string;
+
+                const prereqDocIds: string[] = d.prerequisitesId ?? [];
+                // Resolver cada doc.id de nodo al materiaId real
+                const prereqMateriaIds = prereqDocIds
+                    .map((pid: string) => docIdToMateriaId[pid])
+                    .filter(Boolean) as string[];
+
                 metaMap[mid] = {
-                    semestre:      d.semestre       ?? 0,
-                    prerequisites: d.prerequisitesId ?? [],
+                    semestre:      d.semestre ?? 0,
+                    prerequisites: prereqMateriaIds,
                 };
                 materiaIds.push(mid);
             });
@@ -198,5 +213,23 @@ export function useMatricula() {
         }
     };
 
-    return { materias, loading, obtenerMateriasRealtime, matricularGrupo };
+    const cargarMatriculaUsuario = async (userId: string) => {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            return userSnap.data().matricula ?? [];
+        }
+        return [];
+    };
+
+    const cargarHistorialUsuario = async (userId: string) => {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            return userSnap.data().history ?? [];
+        }
+        return [];
+    };
+
+    return { materias, loading, obtenerMateriasRealtime, matricularGrupo, cargarHistorialUsuario, cargarMatriculaUsuario };
 }
