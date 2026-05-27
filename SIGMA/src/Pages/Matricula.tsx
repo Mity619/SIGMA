@@ -1,29 +1,27 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import AuthContext from "../Context/AuthContext";
 import { useMatricula } from "../Hooks/useMatricula";
-import type { Grupo, Materia } from "../Utils/Graph";
+import type { Grupo } from "../Utils/Graph";
 import StudentNavbar from "../Components/StudentNavbar";
 import "./SCSS/Matricula.scss";
 
 export default function Matricula() {
     const context = useContext(AuthContext);
     if (!context) return null;
-    const { user } = context;
+    const { user, updateUser } = context;
     if (!user) return null;
+
+    // Siempre leer del contexto para que se actualice tras matricular
     const matriculaUsuario = user.matricula ?? [];
-    const historialUsuario = user.history ?? [];
+    const historialUsuario = user.history   ?? [];
 
     const { materias, loading, obtenerMateriasRealtime, matricularGrupo } = useMatricula();
-
     const unsubRef = useRef<(() => void) | null>(null);
 
-    // Expandir/colapsar grupos de una materia
-    const [expandida, setExpandida] = useState<string | null>(null);
-
-    // Filtros
-    const [busqueda,  setBusqueda]  = useState("");
-    const [filtro,    setFiltro]    = useState<'todas' | 'disponibles' | 'matriculadas'>('todas');
-    const [semestreFiltro, setSemestreFiltro] = useState<number | 'todos'>('todos');
+    const [expandida,     setExpandida]     = useState<string | null>(null);
+    const [busqueda,      setBusqueda]      = useState("");
+    const [filtro,        setFiltro]        = useState<'todas' | 'disponibles' | 'matriculadas'>('todas');
+    const [semestreFiltro,setSemestreFiltro]= useState<number | 'todos'>('todos');
 
     useEffect(() => {
         if (!user.pensum) return;
@@ -34,26 +32,16 @@ export default function Matricula() {
     }, [user.pensum]);
 
     // ── Helpers ───────────────────────────────────────────────
-    const yaMatriculadoEn = (
-        materiaId: string
-    ): string | null => {
 
-        const entrada =
-            matriculaUsuario.find(
-                m => m.materiaId === materiaId
-            );
+    const yaMatriculadoEn = (materiaId: string): string | null =>
+        matriculaUsuario.find(m => m.materiaId === materiaId)?.grupoNombre ?? null;
 
-        return entrada?.grupoNombre ?? null;
-    };
+    // ⚠️ CORRECCIÓN: history contiene IDs de materias YA cursadas.
+    // Si prerequisites está vacío → siempre puede matricular.
+    // Si tiene IDs → todos deben estar en history.
+    const cumpleRequisitos = (prerequisites: string[]): boolean =>
+        prerequisites.length === 0 || prerequisites.every(id => historialUsuario.includes(id));
 
-    const cumpleRequisitos = (
-        prerequisites: string[]
-    ): boolean => {
-
-        return prerequisites.every(
-            id => historialUsuario.includes(id)
-        );
-    };
     const cuposRestantes = (grupo: Grupo): number =>
         grupo.cupos - (grupo.matriculados?.length ?? 0);
 
@@ -73,7 +61,20 @@ export default function Matricula() {
         .filter(m => yaMatriculadoEn(m.id))
         .reduce((acc, m) => acc + (m.creditos ?? 0), 0);
 
-    // ── Render ────────────────────────────────────────────────
+    // Wrapper: tras matricular actualiza el contexto local
+    const handleMatricular = async (materia: typeof materias[0], grupoNombre: string) => {
+        await matricularGrupo(materia, grupoNombre, user);
+        // Actualiza user.matricula en el contexto para reflejar el cambio
+        // sin esperar a que Firebase refresque el auth
+        updateUser({
+            matricula: [
+                ...matriculaUsuario,
+                { materiaId: materia.id, grupoNombre },
+            ],
+        });
+    };
+
+    // ── Sin pénsum ────────────────────────────────────────────
     if (!user.pensum) {
         return (
             <div className="mat-page">
@@ -94,7 +95,7 @@ export default function Matricula() {
             <StudentNavbar />
             <div className="mat-container">
 
-                {/* ── Header ── */}
+                {/* Header */}
                 <div className="mat-header">
                     <div className="mat-header__left">
                         <span className="mat-header__tag">Sistema de Matrículas</span>
@@ -120,7 +121,7 @@ export default function Matricula() {
                     </div>
                 </div>
 
-                {/* ── Controles ── */}
+                {/* Controles */}
                 <div className="mat-controls">
                     <input
                         className="mat-search"
@@ -152,7 +153,7 @@ export default function Matricula() {
                     </select>
                 </div>
 
-                {/* ── Contenido ── */}
+                {/* Lista */}
                 {loading ? (
                     <div className="mat-loader">
                         <div className="mat-loader__spinner" />
@@ -166,20 +167,20 @@ export default function Matricula() {
                 ) : (
                     <div className="mat-list">
                         {materiasFiltradas.map(materia => {
-                            const grupoActual   = yaMatriculadoEn(materia.id);
-                            const tieneReqs     = cumpleRequisitos(materia.prerequisites);
-                            const abierta       = expandida === materia.id;
+                            const grupoActual = yaMatriculadoEn(materia.id);
+                            const tieneReqs   = cumpleRequisitos(materia.prerequisites);
+                            const abierta     = expandida === materia.id;
 
                             return (
                                 <div
                                     key={materia.id}
                                     className={[
                                         'mat-card',
-                                        grupoActual  ? 'mat-card--matriculada' : '',
-                                        !tieneReqs   ? 'mat-card--bloqueada'   : '',
+                                        grupoActual ? 'mat-card--matriculada' : '',
+                                        !tieneReqs  ? 'mat-card--bloqueada'   : '',
                                     ].join(' ')}
                                 >
-                                    {/* ── Cabecera de la materia ── */}
+                                    {/* Cabecera */}
                                     <div
                                         className="mat-card__header"
                                         onClick={() => setExpandida(abierta ? null : materia.id)}
@@ -188,14 +189,10 @@ export default function Matricula() {
                                             <div className="mat-card__top">
                                                 <span className="mat-card__nombre">{materia.nombre}</span>
                                                 {grupoActual && (
-                                                    <span className="mat-badge mat-badge--green">
-                                                        ✓ {grupoActual}
-                                                    </span>
+                                                    <span className="mat-badge mat-badge--green">✓ {grupoActual}</span>
                                                 )}
                                                 {!tieneReqs && !grupoActual && (
-                                                    <span className="mat-badge mat-badge--red">
-                                                        🔒 Requisitos
-                                                    </span>
+                                                    <span className="mat-badge mat-badge--red">🔒 Requisitos</span>
                                                 )}
                                             </div>
                                             <div className="mat-card__meta">
@@ -207,12 +204,11 @@ export default function Matricula() {
                                                 <span>·</span>
                                                 <span>{materia.grupos?.length ?? 0} grupo{(materia.grupos?.length ?? 0) !== 1 ? 's' : ''}</span>
                                             </div>
-                                            {/* Requisitos */}
                                             {materia.prerequisites.length > 0 && (
                                                 <div className="mat-card__reqs">
                                                     <span className="mat-card__reqs-label">Requisitos:</span>
                                                     {materia.prerequisites.map(id => {
-                                                        const aprobada = historialUsuario.includes(id);
+                                                        const aprobada  = historialUsuario.includes(id);
                                                         const nombreReq = materias.find(m => m.id === id)?.nombre ?? id;
                                                         return (
                                                             <span
@@ -226,15 +222,15 @@ export default function Matricula() {
                                                 </div>
                                             )}
                                         </div>
-                                        <span className={`mat-card__chevron ${abierta ? 'mat-card__chevron--open' : ''}`}>
-                                            ›
-                                        </span>
+                                        <span className={`mat-card__chevron ${abierta ? 'mat-card__chevron--open' : ''}`}>›</span>
                                     </div>
 
-                                    {/* ── Grupos (desplegable) ── */}
+                                    {/* Grupos */}
                                     {abierta && (
                                         <div className="mat-grupos">
                                             {(materia.grupos ?? []).map(grupo => {
+                                                // ⚠️ cuposRestantes lee directo del estado reactivo
+                                                // que se actualiza via onSnapshot en tiempo real
                                                 const restantes  = cuposRestantes(grupo);
                                                 const lleno      = restantes <= 0;
                                                 const esteGrupo  = grupoActual === grupo.nombre;
@@ -248,8 +244,8 @@ export default function Matricula() {
                                                         key={grupo.nombre}
                                                         className={[
                                                             'mat-grupo',
-                                                            lleno     ? 'mat-grupo--lleno'      : '',
-                                                            esteGrupo ? 'mat-grupo--matriculado' : '',
+                                                            lleno     ? 'mat-grupo--lleno'       : '',
+                                                            esteGrupo ? 'mat-grupo--matriculado'  : '',
                                                         ].join(' ')}
                                                     >
                                                         <div className="mat-grupo__info">
@@ -261,7 +257,6 @@ export default function Matricula() {
                                                                 {lleno     && <span className="mat-badge mat-badge--red">Agotado</span>}
                                                                 {esteGrupo && <span className="mat-badge mat-badge--green">✓ Inscrito</span>}
                                                             </div>
-                                                            {/* Barra de ocupación */}
                                                             <div className="mat-grupo__bar">
                                                                 <div
                                                                     className={`mat-grupo__bar-fill ${ocupacion >= 100 ? 'mat-grupo__bar-fill--full' : ocupacion >= 70 ? 'mat-grupo__bar-fill--warn' : ''}`}
@@ -273,12 +268,12 @@ export default function Matricula() {
                                                         <button
                                                             className={[
                                                                 'mat-grupo__btn',
-                                                                esteGrupo          ? 'mat-grupo__btn--inscrito'   : '',
+                                                                esteGrupo           ? 'mat-grupo__btn--inscrito'  : '',
                                                                 lleno && !esteGrupo ? 'mat-grupo__btn--lleno'     : '',
-                                                                !tieneReqs         ? 'mat-grupo__btn--bloqueado'  : '',
+                                                                !tieneReqs          ? 'mat-grupo__btn--bloqueado' : '',
                                                             ].join(' ')}
                                                             disabled={lleno || !!grupoActual || !tieneReqs}
-                                                            onClick={() => matricularGrupo(materia, grupo.nombre, user)}
+                                                            onClick={() => handleMatricular(materia, grupo.nombre)}
                                                         >
                                                             {esteGrupo   ? '✓ Inscrito'  :
                                                              lleno       ? 'Sin cupos'   :

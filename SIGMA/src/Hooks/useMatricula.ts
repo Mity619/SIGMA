@@ -9,11 +9,12 @@ import {
     where,
     arrayUnion,
     runTransaction,
+    onSnapshot,
 } from "firebase/firestore";
-import type {User} from "../Utils/User";
-import type {Materia, Grupo} from "../Utils/Graph";
-import { onSnapshot } from "firebase/firestore";
+import type { User } from "../Utils/User";
+import type { Materia, Grupo } from "../Utils/Graph";
 import { enqueueSnackbar } from "notistack";
+
 type MateriaCompleta = Materia & {
     semestre: number;
     prerequisites: string[];
@@ -21,166 +22,107 @@ type MateriaCompleta = Materia & {
 
 export function useMatricula() {
     const [materias, setMaterias] = useState<MateriaCompleta[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading,  setLoading]  = useState(false);
 
-    const obtenerMateriasRealtime = async (
-        pensumId: string
-    ) => {
-    
+    const obtenerMateriasRealtime = async (pensumId: string) => {
         setLoading(true);
-    
+
         try {
-        
-            // ─────────────────────────────────────
-            // 1. Buscar grafo del pensum
-            // ─────────────────────────────────────
-            const qGraph = query(
-                collection(db, "AcademicGraph"),
-                where("pensumId", "==", pensumId)
+            // ── 1. Obtener graphId desde AcademicGraph ────────
+            const graphSnap = await getDocs(
+                query(collection(db, "AcademicGraph"), where("pensumId", "==", pensumId))
             );
-        
-            const graphSnap = await getDocs(qGraph);
-        
+
             if (graphSnap.empty) {
-            
                 setMaterias([]);
                 setLoading(false);
-            
                 return;
             }
-        
+
             const graphId = graphSnap.docs[0].id;
-        
-            // ─────────────────────────────────────
-            // 2. Escuchar GrafoMaterias
-            // ─────────────────────────────────────
-            const qGrafoMaterias = query(
-                collection(db, "GrafoMaterias"),
-                where("graphId", "==", graphId)
+
+            // ── 2. Obtener nodos del grafo (una vez, sin RT) ──
+            //    Los nodos del grafo no cambian; solo cambian los
+            //    cupos dentro de "Materias".
+            const grafoSnap = await getDocs(
+                query(collection(db, "GrafoMaterias"), where("graphId", "==", graphId))
             );
-        
-            // Listener principal
-            const unsubscribeGrafo = onSnapshot(
-                qGrafoMaterias,
-                async (snapshot) => {
-                
-                    try {
-                    
-                        // ─────────────────────────
-                        // Metadata del grafo
-                        // ─────────────────────────
-                        const materiasBase =
-                            snapshot.docs.map((nodo) => {
-                            
-                                const dataNodo = nodo.data();
-                            
-                                return {
-                                    materiaId:
-                                        dataNodo.materiaId as string,
-                                
-                                    semestre:
-                                        dataNodo.semestre ?? 0,
-                                
-                                    prerequisites:
-                                        dataNodo.prerequisitesId ?? [],
-                                };
-                            });
-                        
-                        // ─────────────────────────
-                        // Obtener TODAS las materias
-                        // ─────────────────────────
-                        const lista: MateriaCompleta[] =
-                            await Promise.all(
-                            
-                            materiasBase.map(
-                                async (base) => {
-                                
-                                    const materiaRef = doc(
-                                        db,
-                                        "Materias",
-                                        base.materiaId
-                                    );
-                                
-                                    const materiaSnap =
-                                        await getDoc(
-                                            materiaRef
-                                        );
-                                    
-                                    // Fallback
-                                    if (!materiaSnap.exists()) {
-                                    
-                                        return {
-                                            id: base.materiaId,
-                                            carreraId: "",
-                                            nombre: base.materiaId,
-                                            codigo: "",
-                                            creditos: 0,
-                                            grupos: [],
-                                            semestre: base.semestre,
-                                            prerequisites:
-                                                base.prerequisites,
-                                        };
-                                    }
-                                
-                                    const data =
-                                        materiaSnap.data();
-                                
-                                    return {
-                                    
-                                        // Datos reales Materias
-                                        id:
-                                            materiaSnap.id,
-                                    
-                                        carreraId:
-                                            data.carreraId ?? "",
-                                    
-                                        nombre:
-                                            data.nombre ?? "",
-                                    
-                                        codigo:
-                                            data.codigo ?? "",
-                                    
-                                        creditos:
-                                            data.creditos ?? 0,
-                                    
-                                        grupos:
-                                            data.grupos ?? [],
-                                    
-                                        // Datos del grafo
-                                        semestre:
-                                            base.semestre,
-                                    
-                                        prerequisites:
-                                            base.prerequisites,
-                                    };
-                                }
-                            ));
-                        
-                        // ─────────────────────────
-                        // Ordenar
-                        // ─────────────────────────
-                        lista.sort(
-                            (a, b) =>
-                                a.semestre - b.semestre
-                        );
-                    
-                        setMaterias(lista);
-                    
-                    } catch (e) {
-                    
-                        console.error(e);
+
+            if (grafoSnap.empty) {
+                setMaterias([]);
+                setLoading(false);
+                return;
+            }
+
+            // Mapa materiaId → metadata del grafo
+            const metaMap: Record<string, { semestre: number; prerequisites: string[] }> = {};
+            const materiaIds: string[] = [];
+
+            grafoSnap.docs.forEach(nodo => {
+                const d = nodo.data();
+                const mid = d.materiaId as string;
+                metaMap[mid] = {
+                    semestre:      d.semestre       ?? 0,
+                    prerequisites: d.prerequisitesId ?? [],
+                };
+                materiaIds.push(mid);
+            });
+
+            // ── 3. Escuchar cambios en CADA documento Materias ─
+            //    onSnapshot sobre cada doc individual para que
+            //    cualquier cambio en grupos/cupos actualice la UI.
+            const unsubscribers: (() => void)[] = [];
+
+            // Estado local mutable para merge parcial
+            const materiasMap: Record<string, MateriaCompleta> = {};
+
+            const flush = () => {
+                const lista = Object.values(materiasMap);
+                lista.sort((a, b) => a.semestre - b.semestre);
+                setMaterias([...lista]);
+                setLoading(false);
+            };
+
+            let cargados = 0;
+
+            materiaIds.forEach(mid => {
+                const ref = doc(db, "Materias", mid);
+                const unsub = onSnapshot(ref, snap => {
+                    if (!snap.exists()) {
+                        // Fallback si el doc no existe
+                        materiasMap[mid] = {
+                            id: mid, carreraId: "", nombre: mid,
+                            codigo: "", creditos: 0, grupos: [],
+                            semestre:      metaMap[mid].semestre,
+                            prerequisites: metaMap[mid].prerequisites,
+                        };
+                    } else {
+                        const d = snap.data();
+                        materiasMap[mid] = {
+                            id:            snap.id,
+                            carreraId:     d.carreraId  ?? "",
+                            nombre:        d.nombre     ?? "",
+                            codigo:        d.codigo     ?? "",
+                            creditos:      d.creditos   ?? 0,
+                            grupos:        d.grupos     ?? [],   // ← cupos en tiempo real
+                            semestre:      metaMap[mid].semestre,
+                            prerequisites: metaMap[mid].prerequisites,
+                        };
                     }
-                
-                    setLoading(false);
-                }
-            );
-        
-            return unsubscribeGrafo;
-        
+                    cargados++;
+                    // Primera carga: esperar a tener todos
+                    if (cargados >= materiaIds.length) flush();
+                    // Actualizaciones posteriores: flush inmediato
+                    else if (materiasMap[mid]) flush();
+                });
+                unsubscribers.push(unsub);
+            });
+
+            // Devuelve función que cancela TODOS los listeners
+            return () => unsubscribers.forEach(u => u());
+
         } catch (e) {
-        
             console.error(e);
-        
             setLoading(false);
         }
     };
@@ -190,148 +132,71 @@ export function useMatricula() {
         grupoNombre: string,
         user: User
     ) => {
-    
         try {
-        
-            // ─────────────────────────────
-            // Validar requisitos
-            // ─────────────────────────────
-            const cumple =
-                materia.prerequisites.every(
-                    id => user.history.includes(id)
-                );
-            
+            // ── Validar requisitos ────────────────────────────
+            // Si NO tiene prerequisites → puede matricular.
+            // Si tiene prerequisites → TODOS deben estar en history.
+            // CORRECCIÓN: prerequisites contiene IDs de materias
+            // que el estudiante DEBE HABER CURSADO (estar en history).
+            const history = user.history ?? [];
+
+            const cumple = materia.prerequisites.length === 0
+                || materia.prerequisites.every(id => history.includes(id));
+
             if (!cumple) {
-            
-                enqueueSnackbar(
-                    "No cumples los requisitos",
-                    { variant: "error" }
-                );
-            
+                enqueueSnackbar("No cumples los requisitos para esta materia", { variant: "error" });
                 return;
             }
-        
-            const materiaRef = doc(
-                db,
-                "Materias",
-                materia.id
-            );
-        
-            await runTransaction(
-                db,
-                async (transaction) => {
-                
-                    const snap =
-                        await transaction.get(
-                            materiaRef
-                        );
-                    
-                    if (!snap.exists()) {
-                        throw new Error(
-                            "Materia no encontrada"
-                        );
-                    }
-                
-                    const data = snap.data();
-                
-                    const grupos =
-                        data.grupos ?? [];
-                
-                    const index =
-                        grupos.findIndex(
-                            (g: Grupo) =>
-                                g.nombre === grupoNombre
-                        );
-                    
-                    if (index === -1) {
-                        throw new Error(
-                            "Grupo no existe"
-                        );
-                    }
-                
-                    const grupo =
-                        grupos[index];
-                
-                    // ───────────────────────
-                    // Validar cupos
-                    // ───────────────────────
-                    if (
-                        grupo.matriculados.length
-                        >=
-                        grupo.cupos
-                    ) {
-                    
-                        throw new Error(
-                            "Cupos agotados"
-                        );
-                    }
-                
-                    // Evitar duplicados
-                    if (
-                        grupo.matriculados.includes(
-                            user.id
-                        )
-                    ) {
-                    
-                        throw new Error(
-                            "Ya matriculado"
-                        );
-                    }
-                
-                    // ───────────────────────
-                    // Añadir estudiante
-                    // ───────────────────────
-                    grupo.matriculados.push(
-                        user.id
-                    );
-                
-                    grupos[index] = grupo;
-                
-                    transaction.update(
-                        materiaRef,
-                        { grupos }
-                    );
-                
-                    // ───────────────────────
-                    // Actualizar usuario
-                    // ───────────────────────
-                    const userRef = doc(
-                        db,
-                        "users",
-                        user.id
-                    );
-                
-                    transaction.update(
-                        userRef,
-                        {
-                            matricula: arrayUnion({
-                                materiaId: materia.id,
-                                grupoNombre,
-                            })
-                        }
-                    );
-                }
-            );
-        
-            enqueueSnackbar(
-                "Matriculado correctamente",
-                { variant: "success" }
-            );
-        
+
+            const materiaRef = doc(db, "Materias", materia.id);
+            const userRef    = doc(db, "users", user.id);
+
+            await runTransaction(db, async (tx) => {
+                const snap = await tx.get(materiaRef);
+                if (!snap.exists()) throw new Error("Materia no encontrada");
+
+                const grupos: Grupo[] = snap.data().grupos ?? [];
+                const index = grupos.findIndex(g => g.nombre === grupoNombre);
+
+                if (index === -1) throw new Error("El grupo no existe");
+
+                const grupo = grupos[index];
+
+                // Validar cupos en transacción (evita race condition)
+                const matriculados: string[] = grupo.matriculados ?? [];
+
+                if (matriculados.length >= grupo.cupos)
+                    throw new Error("Cupos agotados para este grupo");
+
+                // Evitar doble matrícula en el mismo grupo
+                if (matriculados.includes(user.id))
+                    throw new Error("Ya estás matriculado en este grupo");
+
+                // Evitar matrícula en otro grupo de la misma materia
+                const yaEnOtroGrupo = grupos.some(
+                    (g, i) => i !== index && (g.matriculados ?? []).includes(user.id)
+                );
+                if (yaEnOtroGrupo)
+                    throw new Error("Ya estás matriculado en otro grupo de esta materia");
+
+                // Añadir estudiante al grupo
+                grupos[index] = {
+                    ...grupo,
+                    matriculados: [...matriculados, user.id],
+                };
+
+                tx.update(materiaRef, { grupos });
+                tx.update(userRef, {
+                    matricula: arrayUnion({ materiaId: materia.id, grupoNombre }),
+                });
+            });
+
+            enqueueSnackbar("¡Matriculado correctamente!", { variant: "success" });
+
         } catch (e: any) {
-        
-            enqueueSnackbar(
-                e.message,
-                { variant: "error" }
-            );
+            enqueueSnackbar(e.message ?? "Error al matricular", { variant: "error" });
         }
     };
 
-    return {
-        materias,
-        loading,
-        obtenerMateriasRealtime,
-        matricularGrupo,
-    }
-    
+    return { materias, loading, obtenerMateriasRealtime, matricularGrupo };
 }
