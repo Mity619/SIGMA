@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
+import { closeSnackbar, useSnackbar } from 'notistack';
 import type { KeyboardEvent } from "react";
 import { useArchivo } from "../Hooks/useArbolAcademico";
 import AuthContext from "../Context/AuthContext";
@@ -143,6 +144,7 @@ const IconEmpty = () => (
 export default function ArbolAcademico() {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [name, setName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -193,7 +195,12 @@ export default function ArbolAcademico() {
 
   // Agregar nodo
   const handleAdd = async () => {
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      enqueueSnackbar("Debes ingresar un nombre antes de crear el elemento", {
+        variant: "warning",
+      });
+      return;
+    }
 
     let allowedType: "Facultad" | "Carrera" | "Pensum" | null = null;
 
@@ -208,23 +215,120 @@ export default function ArbolAcademico() {
     }
 
     if (!allowedType || allowedType !== expectedType) {
-      alert(`No puedes crear un(a) ${expectedType} aquí. Debes crear un(a) ${allowedType}.`);
+      enqueueSnackbar(
+        `No puedes crear un(a) ${expectedType} aquí. Debes crear un(a) ${allowedType}.`,
+        { variant: "warning" }
+      );
       return;
     }
 
     const childrenId = expectedType === "Pensum" ? "" : null;
 
-    await addNode(name, expectedType, selectedParent, childrenId);
+    try {
+      await addNode(name, expectedType, selectedParent, childrenId);
 
-    setName("");
-    setSelectedParent(null);
-    await refresh();
+      if (expectedType === "Facultad") {
+        enqueueSnackbar("Facultad creada correctamente", {
+          variant: "success",
+        });
+      }
+
+      if (expectedType === "Carrera") {
+        enqueueSnackbar("Carrera creada correctamente", {
+          variant: "success",
+        });
+      }
+
+      if (expectedType === "Pensum") {
+        enqueueSnackbar("Pensum creado correctamente", {
+          variant: "success",
+        });
+      }
+
+      setName("");
+      setSelectedParent(null);
+      await refresh();
+    } catch (error) {
+      enqueueSnackbar("Ocurrió un error al crear el elemento", {
+        variant: "error",
+      });
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleAdd();
     }
+  };
+
+const handleSaveEdit = async (nodeId: string) => {
+  if (!editName.trim()) {
+    enqueueSnackbar("El nombre no puede quedar vacío", {
+      variant: "warning",
+    });
+    return;
+  }
+
+  try {
+    await editNode(nodeId, editName.trim());
+    setEditingId(null);
+    setEditName("");
+
+    enqueueSnackbar("Elemento actualizado correctamente", {
+      variant: "success",
+    });
+
+    await refresh();
+  } catch (error) {
+    enqueueSnackbar("Ocurrió un error al actualizar el elemento", {
+      variant: "error",
+    });
+  }
+};
+
+  const handleDeleteNode = (node: any) => {
+    enqueueSnackbar(
+      `¿Seguro que quieres eliminar "${node.name}"? Si tiene elementos relacionados también se eliminarán.`,
+      {
+        variant: "warning",
+        persist: true,
+        action: (snackbarId) => (
+          <div className="arbol-academico__snackbar-actions">
+            <button
+              type="button"
+              className="arbol-academico__snackbar-btn arbol-academico__snackbar-btn--danger"
+              onClick={async () => {
+                closeSnackbar(snackbarId);
+
+                try {
+                  await deleteNode(node.id);
+
+                  enqueueSnackbar("Elemento eliminado correctamente", {
+                    variant: "success",
+                  });
+
+                  await refresh();
+                } catch (error) {
+                  enqueueSnackbar("Ocurrió un error al eliminar el elemento", {
+                    variant: "error",
+                  });
+                }
+              }}
+            >
+              Eliminar
+            </button>
+
+            <button
+              type="button"
+              className="arbol-academico__snackbar-btn arbol-academico__snackbar-btn--secondary"
+              onClick={() => closeSnackbar(snackbarId)}
+            >
+              Cancelar
+            </button>
+          </div>
+        ),
+      }
+    );
   };
 
   // Nodo individual del árbol
@@ -264,12 +368,12 @@ export default function ArbolAcademico() {
                 autoFocus
                 onKeyDown={async (e) => {
                   if (e.key === "Enter") {
-                    await editNode(node.id, editName);
-                    setEditingId(null);
+                    await handleSaveEdit(node.id);
                   }
 
                   if (e.key === "Escape") {
                     setEditingId(null);
+                    setEditName("");
                   }
                 }}
               />
@@ -321,10 +425,7 @@ export default function ArbolAcademico() {
             {editingId === node.id ? (
               <button
                 className="arbol-academico__action-btn arbol-academico__action-btn--save"
-                onClick={async () => {
-                  await editNode(node.id, editName);
-                  setEditingId(null);
-                }}
+                onClick={() => handleSaveEdit(node.id)}
                 title="Guardar"
               >
                 <IconSave />
@@ -342,15 +443,13 @@ export default function ArbolAcademico() {
               </button>
             )}
 
-            <button
-              className="arbol-academico__action-btn arbol-academico__action-btn--delete"
-              onClick={async () => {
-                await deleteNode(node.id);
-              }}
-              title="Eliminar"
-            >
-              <IconDelete />
-            </button>
+              <button
+                className="arbol-academico__action-btn arbol-academico__action-btn--delete"
+                onClick={() => handleDeleteNode(node)}
+                title="Eliminar"
+              >
+                <IconDelete />
+              </button>
           </div>
         </div>
 

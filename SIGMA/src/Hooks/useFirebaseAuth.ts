@@ -27,7 +27,8 @@ export const useFirebaseAuth = () => {
                     type: data.type,
                     enroll: data.enroll,
                     name: data.name,
-                    history: data.history || [], // si no existe, array vacío
+                    history: data.history || [],
+                    pensum: data.pensum || null,
                 };
                 return userData;
             }
@@ -75,28 +76,29 @@ export const useFirebaseAuth = () => {
         name: string,
         enroll: EnrollmentStatus
     ) => {
-      try {
-          // 1. Crear usuario en Firebase Auth
-          const res = await createUserWithEmailAndPassword(auth, email, password);
-          const uid = res.user.uid;
+        try {
+            // 1. Crear usuario en Firebase Auth
+            const res = await createUserWithEmailAndPassword(auth, email, password);
+            const uid = res.user.uid;
 
-          // 2. Crear documento en Firestore con la estructura exacta de User
-          const newUser: Omit<User, 'id'> = {
-              type,
-              enroll,
-              name,
-              history: [],
-          };
-          await setDoc(doc(db, "users", uid), newUser);
+            // 2. Crear documento en Firestore con la estructura exacta de User
+            const newUser: Omit<User, 'id'> = {
+                type,
+                enroll,
+                name,
+                history: [],
+                pensum: null,
+            };
+            await setDoc(doc(db, "users", uid), newUser);
 
-          // 3. Obtener el usuario completo (con id incluido)
-          const userProfile: User = { id: uid, ...newUser };
-          setUser(userProfile);
-          return { success: true, user: userProfile };
-      } catch (error) {
-          console.error("Error en registro:", error);
-          return { success: false, error };
-      }
+            // 3. Obtener el usuario completo (con id incluido)
+            const userProfile: User = { id: uid, ...newUser };
+            setUser(userProfile);
+            return { success: true, user: userProfile };
+        } catch (error) {
+            console.error("Error en registro:", error);
+            return { success: false, error };
+        }
     };
 
     const logout = async () => {

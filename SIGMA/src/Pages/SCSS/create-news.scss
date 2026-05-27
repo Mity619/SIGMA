@@ -1,0 +1,197 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+$purple:      #7C3AED;
+$purple-dark: #5B21B6;
+$purple-light:#EDE9FE;
+$text-dark:   #111827;
+$text-mid:    #4B5563;
+$text-light:  #9CA3AF;
+$border:      #E5E7EB;
+$white:       #ffffff;
+$bg:          #F9FAFB;
+$red:         #EF4444;
+$red-light:   #FEF2F2;
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.create-news {
+  min-height: 100vh;
+  background: $bg;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+
+  &__body {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+  }
+
+  &__card {
+    background: $white;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 2.5rem 2.75rem;
+    width: 100%;
+    max-width: 560px;
+    animation: fadeUp 0.45s ease both;
+
+    @media (max-width: 600px) { padding: 2rem 1.5rem; }
+  }
+
+  &__header {
+    margin-bottom: 2rem;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: none;
+    color: $text-light;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 1.25rem;
+    transition: color 0.2s ease;
+
+    &:hover { color: $purple; }
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: $text-dark;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    font-size: 0.88rem;
+    color: $text-mid;
+    margin-top: 0.35rem;
+  }
+
+  // ── Error ────────────────────────────────────────────────────
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: $red-light;
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: $red;
+    margin-bottom: 1.5rem;
+  }
+
+  // ── Form ─────────────────────────────────────────────────────
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  &__field-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__counter {
+    font-size: 0.75rem;
+    font-family: inherit;
+    color: $text-light;
+    transition: color 0.2s ease;
+
+    &--warn  { color: #D97706; }
+    &--limit { color: $red; font-weight: 700; }
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $text-mid;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    &--optional {
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: $text-light;
+      margin-left: 0.35rem;
+    }
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    border: 1.5px solid $border;
+    border-radius: 10px;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: $text-dark;
+    background: $white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+
+    &::placeholder { color: $text-light; }
+
+    &:focus {
+      border-color: $purple;
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    }
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.55;
+  }
+
+  &__submit {
+    margin-top: 0.5rem;
+    width: 100%;
+    background: $purple;
+    color: $white;
+    border: none;
+    border-radius: 11px;
+    padding: 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: $purple-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124,58,237,0.3);
+    }
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}

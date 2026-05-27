@@ -1,0 +1,310 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+$purple:      #7C3AED;
+$purple-dark: #5B21B6;
+$purple-light:#EDE9FE;
+$text-dark:   #111827;
+$text-mid:    #4B5563;
+$text-light:  #9CA3AF;
+$border:      #E5E7EB;
+$white:       #ffffff;
+$bg:          #F9FAFB;
+$red:         #EF4444;
+$red-light:   #FEF2F2;
+$green:       #10B981;
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.manage-news {
+  min-height: 100vh;
+  background: $bg;
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  color: $text-dark;
+  display: flex;
+  flex-direction: column;
+
+  &__body {
+    flex: 1;
+    padding: 2.5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    @media (max-width: 768px) { padding: 1.5rem; }
+  }
+
+  // ── Header ───────────────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__back {
+    background: none;
+    border: none;
+    color: $text-light;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+    &:hover { color: $purple; }
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: $text-dark;
+  }
+
+  &__create-btn {
+    background: $purple;
+    color: $white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    &:hover { background: $purple-dark; transform: translateY(-1px); }
+    &:active { transform: translateY(0); }
+  }
+
+  // ── State ────────────────────────────────────────────────────
+  &__state {
+    text-align: center;
+    color: $text-light;
+    padding: 4rem;
+    font-size: 1rem;
+  }
+
+  // ── List ─────────────────────────────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  // ── Item ─────────────────────────────────────────────────────
+  &__item {
+    background: $white;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    overflow: hidden;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  &__item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+
+    @media (max-width: 600px) { flex-direction: column; }
+  }
+
+  &__item-img {
+    width: 90px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: $purple-light;
+
+    @media (max-width: 600px) { width: 100%; height: 140px; }
+  }
+
+  &__item-img--placeholder {
+    width: 90px;
+    height: 70px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, $purple-light, $border);
+
+    @media (max-width: 600px) { width: 100%; height: 80px; }
+  }
+
+  &__item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  &__item-category {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $purple;
+  }
+
+  &__item-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: $text-dark;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__item-meta {
+    font-size: 0.75rem;
+    color: $text-light;
+  }
+
+  &__item-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    align-items: flex-start;
+    padding-top: 0.1rem;
+  }
+
+  &__btn {
+    border: none;
+    border-radius: 8px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    &:active { transform: scale(0.97); }
+
+    &--edit {
+      background: $purple-light;
+      color: $purple;
+      &:hover { background: $purple; color: $white; }
+    }
+
+    &--delete {
+      background: $red-light;
+      color: $red;
+      &:hover { background: $red; color: $white; }
+    }
+
+    &--save {
+      background: $green;
+      color: $white;
+      &:hover { filter: brightness(0.9); }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+
+    &--cancel {
+      background: $border;
+      color: $text-mid;
+      &:hover { background: darken($border, 6%); }
+    }
+  }
+
+  // ── Confirm delete ───────────────────────────────────────────
+  &__confirm {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 1.25rem;
+    background: $red-light;
+    border-top: 1px solid rgba(239,68,68,0.18);
+    font-size: 0.85rem;
+    color: $red;
+    font-weight: 500;
+  }
+
+  &__confirm-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  // ── Edit form ────────────────────────────────────────────────
+  &__edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.25rem;
+    border-top: 1px solid $border;
+    background: $bg;
+  }
+
+  &__edit-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+  }
+
+  &__edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  &__edit-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $text-mid;
+  }
+
+  &__edit-input,
+  &__edit-textarea {
+    width: 100%;
+    border: 1.5px solid $border;
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: $text-dark;
+    background: $white;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    &::placeholder { color: $text-light; }
+    &:focus { border-color: $purple; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+  }
+
+  &__edit-textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.5;
+  }
+
+  &__edit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__edit-counter {
+    font-size: 0.75rem;
+    color: $text-light;
+    &--warn  { color: #D97706; }
+    &--limit { color: $red; font-weight: 700; }
+  }
+
+  &__edit-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__error {
+    font-size: 0.82rem;
+    color: $red;
+    padding: 0.5rem 0.75rem;
+    background: $red-light;
+    border-radius: 8px;
+  }
+}

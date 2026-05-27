@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { closeSnackbar, useSnackbar } from 'notistack';
 import { useArchivo } from "../Hooks/useArbolAcademico";
 import { useAcademicGraph } from "../Hooks/useGrafoAcademico";
 import type { Grupo, GrafoMateria, Materia } from "../Utils/Graph";
@@ -58,7 +59,7 @@ const IconEmpty = () => (
 // Componente principal
 export default function GrafoAcademico() {
     const { pensumId } = useParams();
-
+    const { enqueueSnackbar } = useSnackbar();
     const { nodes } = useArchivo();
 
     const {
@@ -142,11 +143,26 @@ export default function GrafoAcademico() {
     };
 
     const addGrupoToForm = () => {
-        if (!grupoNombre.trim()) {
-            alert("Debes escribir el nombre del grupo.");
+        if (!grupoNombre.trim() || !grupoCupos) {
+            enqueueSnackbar("Completa el nombre del grupo y los cupos disponibles", {
+                variant: "warning",
+            });
             return;
         }
-        const newGrupo: Grupo = { nombre: grupoNombre, cupos: grupoCupos };
+
+        if (grupoCupos <= 0) {
+            enqueueSnackbar("Los cupos deben ser mayores a cero", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        const newGrupo: Grupo = {
+            nombre: grupoNombre.trim(),
+            cupos: grupoCupos,
+            matriculados: []
+        };
+
         setGrupos([...grupos, newGrupo]);
         setGrupoNombre("");
         setGrupoCupos(30);
@@ -158,12 +174,40 @@ export default function GrafoAcademico() {
 
     const handleCreateMateria = async () => {
         if (!carreraId) return;
-        if (!nombre.trim() || !codigo.trim()) {
-            alert("Debes escribir el nombre y el código de la materia.");
+
+        if (!nombre.trim() || !codigo.trim() || !creditos) {
+            enqueueSnackbar("Completa el nombre, código y créditos de la materia", {
+                variant: "warning",
+            });
             return;
         }
-        await addMateriaToCarrera(carreraId, nombre, codigo, creditos, grupos);
-        clearMateriaForm();
+
+        if (creditos <= 0) {
+            enqueueSnackbar("Los créditos deben ser mayores a cero", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        try {
+            await addMateriaToCarrera(
+                carreraId,
+                nombre.trim(),
+                codigo.trim(),
+                creditos,
+                grupos
+            );
+
+            clearMateriaForm();
+
+            enqueueSnackbar("Materia creada correctamente", {
+                variant: "success",
+            });
+        } catch (error) {
+            enqueueSnackbar("Ocurrió un error al crear la materia", {
+                variant: "error",
+            });
+        }
     };
 
     const startEditingMateria = (materia: Materia) => {
@@ -176,19 +220,99 @@ export default function GrafoAcademico() {
 
     const handleEditMateriaCarrera = async () => {
         if (!carreraId || !editingMateriaId) return;
-        if (!editNombre.trim() || !editCodigo.trim()) {
-            alert("Debes escribir el nombre y el código de la materia.");
+
+        if (!editNombre.trim() || !editCodigo.trim() || !editCreditos) {
+            enqueueSnackbar("Completa el nombre, código y créditos de la materia", {
+                variant: "warning",
+            });
             return;
         }
-        await editMateriaCarrera(editingMateriaId, carreraId, editNombre, editCodigo, editCreditos, editGrupos);
-        setEditingMateriaId(null);
+
+        if (editCreditos <= 0) {
+            enqueueSnackbar("Los créditos deben ser mayores a cero", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        try {
+            await editMateriaCarrera(
+                editingMateriaId,
+                carreraId,
+                editNombre.trim(),
+                editCodigo.trim(),
+                editCreditos,
+                editGrupos
+            );
+
+            setEditingMateriaId(null);
+
+            enqueueSnackbar("Materia actualizada correctamente", {
+                variant: "success",
+            });
+        } catch (error) {
+            enqueueSnackbar("Ocurrió un error al actualizar la materia", {
+                variant: "error",
+            });
+        }
     };
 
     const handleDeleteMateriaCarrera = async (materiaId: string) => {
         if (!carreraId) return;
-        const confirmDelete = confirm("¿Seguro que quieres eliminar esta materia de la carrera?");
-        if (!confirmDelete) return;
-        await deleteMateriaCarrera(materiaId, carreraId);
+
+        const materiaAsignadaAlPensum = grafoMaterias.some(
+            (gm) => gm.materiaId === materiaId
+        );
+
+        if (materiaAsignadaAlPensum) {
+            enqueueSnackbar("No se puede eliminar una materia que está asignada al pensum", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        const materia = materias.find((item) => item.id === materiaId);
+
+        enqueueSnackbar(
+            `¿Seguro que quieres eliminar ${materia?.nombre || "esta materia"} del catálogo de la carrera?`,
+            {
+                variant: "warning",
+                persist: true,
+                action: (snackbarId) => (
+                    <div className="grafo-academico__snackbar-actions">
+                        <button
+                            type="button"
+                            className="grafo-academico__snackbar-btn grafo-academico__snackbar-btn--danger"
+                            onClick={async () => {
+                                closeSnackbar(snackbarId);
+
+                                try {
+                                    await deleteMateriaCarrera(materiaId, carreraId);
+
+                                    enqueueSnackbar("Materia eliminada del catálogo de la carrera", {
+                                        variant: "success",
+                                    });
+                                } catch (error) {
+                                    enqueueSnackbar("Ocurrió un error al eliminar la materia", {
+                                        variant: "error",
+                                    });
+                                }
+                            }}
+                        >
+                            Eliminar
+                        </button>
+
+                        <button
+                            type="button"
+                            className="grafo-academico__snackbar-btn grafo-academico__snackbar-btn--secondary"
+                            onClick={() => closeSnackbar(snackbarId)}
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                ),
+            }
+        );
     };
 
     const addGrupoToEditMateria = () => {
@@ -196,7 +320,7 @@ export default function GrafoAcademico() {
         if (!nombreGrupo) return;
         const cuposGrupo = Number(prompt("Cupos del grupo:"));
         if (!cuposGrupo) return;
-        const newGrupo: Grupo = { nombre: nombreGrupo, cupos: cuposGrupo };
+        const newGrupo: Grupo = { nombre: nombreGrupo, cupos: cuposGrupo, matriculados: []};
         setEditGrupos([...editGrupos, newGrupo]);
     };
 
@@ -206,34 +330,134 @@ export default function GrafoAcademico() {
 
     const handleAddMateriaToGraph = async () => {
         if (!graph) return;
+
         if (!selectedMateriaId) {
-            alert("Debes seleccionar una materia.");
+            enqueueSnackbar("Selecciona una materia para asignarla al pensum", {
+                variant: "warning",
+            });
             return;
         }
-        await addMateriaToGraph(graph.id, selectedMateriaId, selectedSemestre);
-        setSelectedMateriaId("");
-        setSelectedSemestre(1);
+
+        if (!selectedSemestre || selectedSemestre <= 0) {
+            enqueueSnackbar("Selecciona el semestre de la materia", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        try {
+            await addMateriaToGraph(graph.id, selectedMateriaId, selectedSemestre);
+
+            setSelectedMateriaId("");
+            setSelectedSemestre(1);
+
+            enqueueSnackbar("Materia asignada al pensum correctamente", {
+                variant: "success",
+            });
+        } catch (error) {
+            enqueueSnackbar("Ocurrió un error al asignar la materia al pensum", {
+                variant: "error",
+            });
+        }
     };
 
     const handleAddPrerequisite = async () => {
         if (!graph) return;
+
         if (!selectedGrafoMateriaId || !selectedPrerequisiteId) {
-            alert("Debes seleccionar una materia y un prerrequisito.");
+            enqueueSnackbar("Selecciona una materia y su prerrequisito", {
+                variant: "warning",
+            });
             return;
         }
-        await addPrerequisite(selectedGrafoMateriaId, selectedPrerequisiteId, graph.id);
-        setSelectedGrafoMateriaId("");
-        setSelectedPrerequisiteId("");
+
+        if (selectedGrafoMateriaId === selectedPrerequisiteId) {
+            enqueueSnackbar("Una materia no puede ser prerrequisito de sí misma", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        const materiaSeleccionada = grafoMaterias.find(
+            (gm) => gm.id === selectedGrafoMateriaId
+        );
+
+        const prerequisitoYaAsignado = materiaSeleccionada?.prerequisitesId.includes(
+            selectedPrerequisiteId
+        );
+
+        if (prerequisitoYaAsignado) {
+            enqueueSnackbar("Ese prerrequisito ya está asignado", {
+                variant: "info",
+            });
+            return;
+        }
+
+        try {
+            await addPrerequisite(
+                selectedGrafoMateriaId,
+                selectedPrerequisiteId,
+                graph.id
+            );
+
+            setSelectedGrafoMateriaId("");
+            setSelectedPrerequisiteId("");
+
+            enqueueSnackbar("Prerrequisito asignado correctamente", {
+                variant: "success",
+            });
+        } catch (error) {
+            enqueueSnackbar("Ocurrió un error al asignar el prerrequisito", {
+                variant: "error",
+            });
+        }
     };
 
     const handleDeleteGrafoMateria = async (gm: GrafoMateria) => {
         if (!graph) return;
+
         const materia = getMateriaInfo(gm.materiaId);
-        const confirmDelete = confirm(
-            `¿Seguro que quieres quitar ${materia?.nombre || "esta materia"} del pensum?`
+
+        enqueueSnackbar(
+            `¿Seguro que quieres quitar ${materia?.nombre || "esta materia"} del pensum?`,
+            {
+                variant: "warning",
+                persist: true,
+                action: (snackbarId) => (
+                    <div className="grafo-academico__snackbar-actions">
+                        <button
+                            type="button"
+                            className="grafo-academico__snackbar-btn grafo-academico__snackbar-btn--danger"
+                            onClick={async () => {
+                                closeSnackbar(snackbarId);
+
+                                try {
+                                    await deleteGrafoMateria(gm.id, graph.id);
+
+                                    enqueueSnackbar("Materia eliminada del pensum", {
+                                        variant: "success",
+                                    });
+                                } catch (error) {
+                                    enqueueSnackbar("Ocurrió un error al eliminar la materia del pensum", {
+                                        variant: "error",
+                                    });
+                                }
+                            }}
+                        >
+                            Quitar
+                        </button>
+
+                        <button
+                            type="button"
+                            className="grafo-academico__snackbar-btn grafo-academico__snackbar-btn--secondary"
+                            onClick={() => closeSnackbar(snackbarId)}
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                ),
+            }
         );
-        if (!confirmDelete) return;
-        await deleteGrafoMateria(gm.id, graph.id);
     };
 
     const startEditingGrafoMateria = (gm: GrafoMateria) => {
@@ -243,8 +467,27 @@ export default function GrafoAcademico() {
 
     const handleEditGrafoMateria = async () => {
         if (!graph || !editingGrafoMateriaId) return;
-        await editGrafoMateria(editingGrafoMateriaId, graph.id, editSemestre);
-        setEditingGrafoMateriaId(null);
+
+        if (!editSemestre || editSemestre <= 0) {
+            enqueueSnackbar("Selecciona el semestre de la materia", {
+                variant: "warning",
+            });
+            return;
+        }
+
+        try {
+            await editGrafoMateria(editingGrafoMateriaId, graph.id, editSemestre);
+
+            setEditingGrafoMateriaId(null);
+
+            enqueueSnackbar("Semestre actualizado correctamente", {
+                variant: "success",
+            });
+        } catch (error) {
+            enqueueSnackbar("Ocurrió un error al actualizar el semestre", {
+                variant: "error",
+            });
+        }
     };
 
     const getGrafoMateriaName = (grafoMateriaId: string) => {
@@ -776,9 +1019,20 @@ export default function GrafoAcademico() {
                                                                         <span key={id} className="grafo-academico__prerequisite-chip">
                                                                             {getGrafoMateriaName(id)}
                                                                             <button
-                                                                                onClick={() => {
+                                                                                onClick={async () => {
                                                                                     if (!graph) return;
-                                                                                    removePrerequisite(gm.id, id, graph.id);
+
+                                                                                    try {
+                                                                                        await removePrerequisite(gm.id, id, graph.id);
+
+                                                                                        enqueueSnackbar("Prerrequisito eliminado correctamente", {
+                                                                                            variant: "success",
+                                                                                        });
+                                                                                    } catch (error) {
+                                                                                        enqueueSnackbar("Ocurrió un error al eliminar el prerrequisito", {
+                                                                                            variant: "error",
+                                                                                        });
+                                                                                    }
                                                                                 }}
                                                                                 title="Quitar prerrequisito"
                                                                             >
