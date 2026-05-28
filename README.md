@@ -369,11 +369,11 @@ Asegúrate de que el archivo `.env` esté incluido en `.gitignore` antes de real
 
 ## 🚀 Despliegue
 
-El proyecto está configurado para desplegarse en servicios de hosting estático compatibles con aplicaciones Vite/React, como **Netlify**, **Vercel** o **Firebase Hosting**.
+El proyecto está configurado para desplegarse en servicios de hosting estático compatibles con aplicaciones Vite/React, como **Netlify**.
 
 | Plataforma | Enlace |
 |---|---|
-| 🌐 Producción | [Enlace al despliegue] |
+| 🌐 Producción | https://sigma-uao.netlify.app/ |
 
 ---
 
@@ -383,7 +383,7 @@ El proyecto está configurado para desplegarse en servicios de hosting estático
 |---|---|
 | 📁 Repositorio GitHub | https://github.com/Mity619/SIGMA.git |
 | 🎨 Propuesta gráfica (Figma / Adobe) | https://www.figma.com/design/GCeRQq6x9O9OJVGsIUiv3e/SIGMA?node-id=0-1&t=EiPdIAZslg2OtHDK-1 |
-| 🌐 Despliegue en producción | [Enlace al despliegue] |
+| 🌐 Despliegue en producción | https://sigma-uao.netlify.app/ |
 
 ---
 
